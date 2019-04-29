@@ -1,0 +1,14 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }} - Scrabble</title>
+      {% else %}
+      <title>Welcome to Scrabble Cheater</title>
+      {% endif %}
+    </head>
+    <body>
+        <div>Scrabble: <a href="/index">Home</a></div>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>
