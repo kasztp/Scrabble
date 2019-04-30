@@ -1,4 +1,3 @@
-# Check if a specific word is in the SCOWL-wl en_US word list
 import random
 import itertools
 import timeit
@@ -9,7 +8,7 @@ from wtforms.validators import DataRequired
 #from flask_bootstrap import Bootstrap
 
 
-filename = 'words.txt'
+filename = 'words.txt'  # SCOWL-wl en_US word list
 score = {}
 db = open(filename, encoding='utf-8')
 words = db.read().splitlines()
@@ -54,17 +53,25 @@ def draw(tileset, n):
 
 
 # Generate possible words (tile permutations)
-def word_gen(owntiles, l):
+def word_gen(owntiles, l, s):
     if l >= 2:
         textperm = []
-        for i in range(2,(l+1)):
-            permutations = set(itertools.permutations(owntiles, r=i))
-            textperm_i = []
+        if s:
+            permutations = set(itertools.permutations(owntiles, r=l))
+            textperm = []
             for element in permutations:
-                textperm_i += [''.join(element)]
-            print('Possible {} length words generated: {}'.format(i, len(textperm_i)))
-            textperm += textperm_i
-        return textperm
+                textperm += [''.join(element)]
+            print('Possible {} length words generated: {}'.format(l, len(textperm)))
+            return textperm
+        else:
+            for i in range(2,(l+1)):
+                permutations = set(itertools.permutations(owntiles, r=i))
+                textperm_i = []
+                for element in permutations:
+                    textperm_i += [''.join(element)]
+                print('Possible {} length words generated: {}'.format(i, len(textperm_i)))
+                textperm += textperm_i
+            return textperm
     else:
         print('ERROR: Word length parameter less than 2!')
 
@@ -132,7 +139,7 @@ app.config['SECRET_KEY'] = 'nobody-gonna-guess-it'
 
 class ConfigForm(FlaskForm):
     #language = StringField('Language', validators=[DataRequired()])
-    language = RadioField('Language', choices=[('EN', 'English'), ('HU', 'Hungarian')], validators=[DataRequired()])
+    language = RadioField('Language', choices=[('EN', 'English')], validators=[DataRequired()])
     max_word_length = RadioField('Max Word Length', choices=[(2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7')], coerce=int, validators=[DataRequired()])
     only_max = BooleanField('Only Max Length?')
     submit = SubmitField('Send')
@@ -148,7 +155,7 @@ def index():
 def config():
     form = ConfigForm()
     if form.validate_on_submit():
-        flash('Configuration saved with Language {}, Max Word Length {}, Calculate for Maximum Length Only={}'.format(
+        flash('Configuration: Language {}, Max Word Length {}, Calculate for Maximum Length Only={}'.format(
             form.language.data, form.max_word_length.data, form.only_max.data))
         if request.method == 'POST':
             language = request.form['language']
@@ -156,7 +163,7 @@ def config():
             tiles = build_tileset(language)
             tile_draw = draw(tiles, 7)
             # tile_draw = ['a', 'p', 'p', 'l', 'e', 'y', 's']
-            word_candidates = word_gen(tile_draw, max_word_length)
+            word_candidates = word_gen(tile_draw, max_word_length, form.only_max.data)
 
             # intersection test
             start_time = timeit.default_timer()
