@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Configuration</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.language.label }}<br>
+            {{ form.language }}
+            {% for error in form.language.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.max_word_length.label }}<br>
+            {{ form.max_word_length }}
+            {% for error in form.max_word_length.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.only_max() }} {{ form.only_max.label }}</p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

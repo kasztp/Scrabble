@@ -2,13 +2,15 @@
 import random
 import itertools
 import timeit
-from flask import Flask
-from flask import render_template
-
-app = Flask(__name__)
+from flask import Flask, render_template, flash, redirect, request, url_for
+from flask_wtf import FlaskForm
+from wtforms import StringField, RadioField, BooleanField, SubmitField
+from wtforms.validators import DataRequired
+#from flask_bootstrap import Bootstrap
 
 
 filename = 'words.txt'
+score = {}
 db = open(filename, encoding='utf-8')
 words = db.read().splitlines()
 db.close()
@@ -78,18 +80,6 @@ def find_inter(ws, wc):
         print('NO valid words found!')
         return 1
 
-'''
-# find test
-def find_in(wc):
-    results = []
-    for keyword in wc:
-        if find_word(keyword) != ():
-            results += [''.join(find_word(keyword))]
-    print(results)
-    print(len(results))
-    return results
-'''
-
 
 def score_calc(words, lang):
     if words != 1:
@@ -118,35 +108,64 @@ def score_calc(words, lang):
         return 1
 
 
-language = 'EN'
+#language = ''
+#max_word_length = 0
 
-tiles = build_tileset('EN')
+#tiles = build_tileset(language)
 # print(tiles)
-tile_draw = draw(tiles, 7)
+#tile_draw = draw(tiles, 7)
 # tile_draw = ['a', 'p', 'p', 'l', 'e', 'y', 's']
-word_candidates = word_gen(tile_draw, 7)
+#word_candidates = word_gen(tile_draw, max_word_length)
 
 # intersection test
-start_time = timeit.default_timer()
-valid_words = find_inter(words, word_candidates)
-print(timeit.default_timer() - start_time)
-
-'''
-# in test
-start_time = timeit.default_timer()
-find_in(word_candidates)
-print(timeit.default_timer() - start_time)
-'''
+#start_time = timeit.default_timer()
+#valid_words = find_inter(words, word_candidates)
+#print(timeit.default_timer() - start_time)
 
 #score_calc(valid_words, language)
+
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'nobody-gonna-guess-it'
+#bootstrap = Bootstrap(app)
+
+
+class ConfigForm(FlaskForm):
+    #language = StringField('Language', validators=[DataRequired()])
+    language = RadioField('Language', choices=[('EN', 'English'), ('HU', 'Hungarian')], validators=[DataRequired()])
+    max_word_length = RadioField('Max Word Length', choices=[(2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7')], coerce=int, validators=[DataRequired()])
+    only_max = BooleanField('Only Max Length?')
+    submit = SubmitField('Send')
 
 
 @app.route('/index')
 def index():
     user = {'username': 'Peter'}
+    return render_template('index.html', title='Home', user=user, scores=score)
 
-    return render_template('index.html', title='Home', user=user, posts=score_calc(valid_words, language))
-    #return "The valid {} words from draw {} are {}".format(lang, tile_draw, score_calc(valid_words, language))
+
+@app.route('/config', methods=['GET', 'POST'])
+def config():
+    form = ConfigForm()
+    if form.validate_on_submit():
+        flash('Configuration saved with Language {}, Max Word Length {}, Calculate for Maximum Length Only={}'.format(
+            form.language.data, form.max_word_length.data, form.only_max.data))
+        if request.method == 'POST':
+            language = request.form['language']
+            max_word_length = int(request.form['max_word_length'])
+            tiles = build_tileset(language)
+            tile_draw = draw(tiles, 7)
+            # tile_draw = ['a', 'p', 'p', 'l', 'e', 'y', 's']
+            word_candidates = word_gen(tile_draw, max_word_length)
+
+            # intersection test
+            start_time = timeit.default_timer()
+            valid_words = find_inter(words, word_candidates)
+            print(timeit.default_timer() - start_time)
+            global score
+            score = score_calc(valid_words, language)
+        return redirect(url_for('index'))
+    return render_template('config.html', title='Configuration', form=form)
 
 
 if __name__ == '__main__':

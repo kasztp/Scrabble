@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>Hi, {{ user.username }}!</h1>
-    {% for post,v in posts.items() %}
-    <div><p>{{ post }} worth: <b>{{ v }}</b></p></div>
+    {% for score,v in scores.items() %}
+    <div><p>{{ score }} worth: <b>{{ v }}</b></p></div>
     {% endfor %}
 {% endblock %}
