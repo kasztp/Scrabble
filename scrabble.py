@@ -115,23 +115,6 @@ def score_calc(words, lang):
         return 1
 
 
-#language = ''
-#max_word_length = 0
-
-#tiles = build_tileset(language)
-# print(tiles)
-#tile_draw = draw(tiles, 7)
-# tile_draw = ['a', 'p', 'p', 'l', 'e', 'y', 's']
-#word_candidates = word_gen(tile_draw, max_word_length)
-
-# intersection test
-#start_time = timeit.default_timer()
-#valid_words = find_inter(words, word_candidates)
-#print(timeit.default_timer() - start_time)
-
-#score_calc(valid_words, language)
-
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'nobody-gonna-guess-it'
 #bootstrap = Bootstrap(app)
