@@ -85,7 +85,7 @@ def find_inter(ws, wc):
         return results
     else:
         print('NO valid words found!')
-        return 1
+        return 'NONE'
 
 
 def score_calc(words, lang):
@@ -147,13 +147,15 @@ def config():
             tile_draw = draw(tiles, 7)
             # tile_draw = ['a', 'p', 'p', 'l', 'e', 'y', 's']
             word_candidates = word_gen(tile_draw, max_word_length, form.only_max.data)
-
             # intersection test
             start_time = timeit.default_timer()
             valid_words = find_inter(words, word_candidates)
             print(timeit.default_timer() - start_time)
             global score
-            score = score_calc(valid_words, language)
+            if valid_words != 'NONE':
+                score = score_calc(valid_words, language)
+            else:
+                score['Number of valid words found'] = 0
         return redirect(url_for('index'))
     return render_template('config.html', title='Configuration', form=form)
 
