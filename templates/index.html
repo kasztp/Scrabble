@@ -2,7 +2,20 @@
 
 {% block content %}
     <h1>Hi, {{ user.username }}!</h1>
-    {% for score,v in scores.items() %}
-    <div><p>{{ score }} : <b>{{ v }}</b></p></div>
-    {% endfor %}
+    <div>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+        <tr>
+            <th>Point Value</th><th>Words</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for score,v in scores.items() %}
+        <tr>
+            <td>{{ score }}</td><td>{{ v }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
 {% endblock %}

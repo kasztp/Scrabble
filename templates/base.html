@@ -1,27 +1,27 @@
-<html>
-    <head>
-      {% if title %}
-      <title>{{ title }} - Scrabble</title>
-      {% else %}
-      <title>Welcome to Scrabble Cheater</title>
-      {% endif %}
-    </head>
-    <body>
-        <div>
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}
+      {% if title %}{{ title }} - Scrabble{% else %}Welcome to Scrabble Cheater{% endif %}
+{% endblock %}
+
+{% block navbar %}
+    <nav class="navbar navbar-default">
             Scrabble:
             <a href="{{ url_for('index') }}">Home</a>
             <a href="{{ url_for('config') }}">Configuration</a>
-        </div>
-        <hr>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-        <ul>
             {% for message in messages %}
             <li>{{ message }}</li>
             {% endfor %}
-        </ul>
         {% endif %}
         {% endwith %}
-        {% block content %}{% endblock %}
-    </body>
-</html>
+
+        {% block app_content %}{% endblock %}
+    </div>
+{% endblock %}

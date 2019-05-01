@@ -5,7 +5,7 @@ from flask import Flask, render_template, flash, redirect, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, RadioField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
-#from flask_bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap
 
 
 filename = 'words.txt'  # SCOWL-wl en_US word list
@@ -64,7 +64,7 @@ def word_gen(owntiles, l, s):
             print('Possible {} length words generated: {}'.format(l, len(textperm)))
             return textperm
         else:
-            for i in range(2,(l+1)):
+            for i in range(2, (l+1)):
                 permutations = set(itertools.permutations(owntiles, r=i))
                 textperm_i = []
                 for element in permutations:
@@ -106,7 +106,9 @@ def score_calc(words, lang):
                     value += characters_en.get(character)
                 scores[word] = value
             print(scores)
-            return scores
+            grouped = group_by_score(scores)
+            print(grouped)
+            return grouped
         else:
             print('ERROR: Unsupported Language: {}'.format(lang))
             return 1
@@ -115,9 +117,24 @@ def score_calc(words, lang):
         return 1
 
 
+def group_by_score(scores):
+    score_groups = sorted(set(val for val in scores.values()), reverse=True)
+    print(score_groups)
+    grouped_words = {}
+    for number in score_groups:
+        wordgroup = []
+        for i in scores.items():
+            #print(i)
+            if i[1] == number:
+                wordgroup.extend(i[0:1])
+        #print(wordgroup)
+        grouped_words[number] = wordgroup
+    return grouped_words
+
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'nobody-gonna-guess-it'
-#bootstrap = Bootstrap(app)
+bootstrap = Bootstrap(app)
 
 
 class ConfigForm(FlaskForm):
@@ -140,7 +157,7 @@ def config():
     if form.validate_on_submit():
         flash('Configuration: Language {}, Max Word Length {}, Calculate for Maximum Length Only={}'.format(
             form.language.data, form.max_word_length.data, form.only_max.data))
-    
+
         if request.method == 'POST':
             language = request.form['language']
             max_word_length = int(request.form['max_word_length'])
@@ -158,8 +175,10 @@ def config():
             valid_words = find_inter(words, word_candidates)
             print(timeit.default_timer() - start_time)
             global score
+            score = {}
             if valid_words != 'NONE':
                 score = score_calc(valid_words, language)
+
             else:
                 score['Number of valid words found'] = 0
         return redirect(url_for('index'))
