@@ -121,9 +121,9 @@ app.config['SECRET_KEY'] = 'nobody-gonna-guess-it'
 
 
 class ConfigForm(FlaskForm):
-    #language = StringField('Language', validators=[DataRequired()])
     language = RadioField('Language', choices=[('EN', 'English')], validators=[DataRequired()])
     max_word_length = RadioField('Max Word Length', choices=[(2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7')], coerce=int, validators=[DataRequired()])
+    own_tileset = StringField('Enter your own tiles here (without any breaks):')
     only_max = BooleanField('Only Max Length?')
     submit = SubmitField('Send')
 
@@ -140,12 +140,18 @@ def config():
     if form.validate_on_submit():
         flash('Configuration: Language {}, Max Word Length {}, Calculate for Maximum Length Only={}'.format(
             form.language.data, form.max_word_length.data, form.only_max.data))
+    
         if request.method == 'POST':
             language = request.form['language']
             max_word_length = int(request.form['max_word_length'])
             tiles = build_tileset(language)
-            tile_draw = draw(tiles, 7)
-            # tile_draw = ['a', 'p', 'p', 'l', 'e', 'y', 's']
+            if form.own_tileset.data:
+                tile_draw = []
+                for c in form.own_tileset.data:
+                    tile_draw += [c]
+            else:
+                tile_draw = draw(tiles, 7)
+            flash('Tiles: {}'.format(tile_draw))
             word_candidates = word_gen(tile_draw, max_word_length, form.only_max.data)
             # intersection test
             start_time = timeit.default_timer()

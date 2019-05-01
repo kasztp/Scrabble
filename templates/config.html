@@ -18,6 +18,10 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+        <p>
+            {{ form.own_tileset.label }}<br>
+            {{ form.own_tileset(size=7) }}
+        </p>
         <p>{{ form.only_max() }} {{ form.only_max.label }}</p>
         <p>{{ form.submit() }}</p>
     </form>
