@@ -6,11 +6,11 @@
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.language.label }}<br>
-            {{ form.language }}
-            {% for error in form.language.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
+                {{ form.language.label }}<br>
+                {{ form.language }}
+                {% for error in form.language.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
         </p>
         <p>
             {{ form.max_word_length.label }}<br>
@@ -26,4 +26,5 @@
         <p>{{ form.only_max() }} {{ form.only_max.label }}</p>
         <p>{{ form.submit() }}</p>
     </form>
+    </div>
 {% endblock %}

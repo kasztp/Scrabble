@@ -12,7 +12,7 @@
         <tbody>
         {% for score,v in scores.items() %}
         <tr>
-            <td>{{ score }}</td><td>{{ v }}</td>
+            <td>{{ score }}</td><td>{% for w in v %}{{ w }} | {% endfor %}</td>
         </tr>
         {% endfor %}
         </tbody>

@@ -9,17 +9,30 @@ from flask_bootstrap import Bootstrap
 
 
 filename = 'words.txt'  # SCOWL-wl en_US word list
-score = {}
 db = open(filename, encoding='utf-8')
-words = db.read().splitlines()
+EN_words = db.read().splitlines()
 db.close()
 
+filename = 'szavak.txt'  # https://sourceforge.net/projects/wordlist-hu/ hu_HU word list
+db = open(filename, encoding='utf-8')
+HU_words = db.read().splitlines()
+db.close()
 
-def find_word(word):
-    if word in words:
-        return word
-    else:
-        return ()
+scores = {}
+grouped = {}
+
+
+def find_word(word, lang):
+    if lang == 'EN':
+        if word in EN_words:
+            return word
+        else:
+            return ()
+    elif lang == 'HU':
+        if word in HU_words:
+            return word
+        else:
+            return ()
     #    print('{} found in word database!'.format(word))
     # else:
     #     print('{} NOT found in word database!'.format(word))
@@ -32,6 +45,16 @@ def build_tileset(lang):
                    ['k'] + ['l']*4 + ['m']*2 + ['n']*6 + ['o']*8 + ['p']*2 + ['q'] + ['r']*6 + ['s']*4 + ['t']*6 +\
                    ['u']*4 + ['v']*2 + ['w']*2 + ['x'] + ['y']*2 + ['z']
         if len(tile_set) == 98:
+            print('Tile set generated OK!')
+            return tile_set
+        else:
+            print('ERROR: Tile set generation error with length: {}'.format(len(tile_set)))
+            return len(tile_set)
+    elif lang == 'HU':
+        tile_set = ['a'] * 6 + ['b'] * 3 + ['c'] + ['d'] * 3 + ['e'] * 6 + ['f'] * 2 + ['g'] * 3 + ['h'] * 2 + ['i'] * 3 + ['j'] * 2 + \
+                   ['k'] * 6 + ['l'] * 4 + ['m'] * 3 + ['n'] * 4 + ['o'] * 3 + ['p'] * 2 + ['á'] * 4 + ['r'] * 4 + ['s'] * 3 + ['t'] * 5 + \
+                   ['u'] * 2 + ['v'] * 2 + ['é'] * 3 + ['í'] + ['ó'] * 3 + ['z'] * 2 + ['ö'] * 2 + ['ő'] + ['ú'] + ['ü'] * 2 + ['ű']
+        if len(tile_set) == 89:
             print('Tile set generated OK!')
             return tile_set
         else:
@@ -106,9 +129,25 @@ def score_calc(words, lang):
                     value += characters_en.get(character)
                 scores[word] = value
             print(scores)
-            grouped = group_by_score(scores)
-            print(grouped)
-            return grouped
+            return scores
+        elif lang == 'HU':
+                characters_en = dict.fromkeys(["i", "m", "o", "s", "á", "l", "n", "r", "t", "a", "e", "k"], 1)
+                characters_en.update(dict.fromkeys(["b", "d", "g", "ó"], 2))
+                characters_en.update(dict.fromkeys(["h", "v", "é"], 3))
+                characters_en.update(dict.fromkeys(["f", "j", "ö", "p", "u", "ü", "z"], 4))
+                characters_en.update(dict.fromkeys(["c", "í"], 5))
+                characters_en.update(dict.fromkeys(["ő", "ú", "ű"], 7))
+                #characters_en.update(dict.fromkeys(["ly", "zs"], 8))
+                #characters_en.update(dict.fromkeys(["ty"], 10))
+                # print(characters_en)
+                scores = {}
+                for word in words:
+                    value = 0
+                    for character in word:
+                        value += characters_en.get(character)
+                    scores[word] = value
+                print(scores)
+                return scores
         else:
             print('ERROR: Unsupported Language: {}'.format(lang))
             return 1
@@ -128,8 +167,14 @@ def group_by_score(scores):
             if i[1] == number:
                 wordgroup.extend(i[0:1])
         #print(wordgroup)
-        grouped_words[number] = wordgroup
+        grouped_words[number] = sorted(wordgroup)
     return grouped_words
+
+
+def calc_best_hand(tiles):
+    start_time = timeit.default_timer()
+
+    print(timeit.default_timer() - start_time)
 
 
 app = Flask(__name__)
@@ -138,7 +183,7 @@ bootstrap = Bootstrap(app)
 
 
 class ConfigForm(FlaskForm):
-    language = RadioField('Language', choices=[('EN', 'English')], validators=[DataRequired()])
+    language = RadioField('Language', choices=[('EN', 'English'),('HU', 'Hungarian')], validators=[DataRequired()])
     max_word_length = RadioField('Max Word Length', choices=[(2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7')], coerce=int, validators=[DataRequired()])
     own_tileset = StringField('Enter your own tiles here (without any breaks):')
     only_max = BooleanField('Only Max Length?')
@@ -148,7 +193,7 @@ class ConfigForm(FlaskForm):
 @app.route('/index')
 def index():
     user = {'username': 'Peter'}
-    return render_template('index.html', title='Home', user=user, scores=score)
+    return render_template('index.html', title='Home', user=user, scores=grouped)
 
 
 @app.route('/config', methods=['GET', 'POST'])
@@ -160,6 +205,12 @@ def config():
 
         if request.method == 'POST':
             language = request.form['language']
+            if language == 'EN':
+                words = EN_words
+            elif language == 'HU':
+                words = HU_words
+            else:
+                print('ERROR: Unsupported Language!')
             max_word_length = int(request.form['max_word_length'])
             tiles = build_tileset(language)
             if form.own_tileset.data:
@@ -174,13 +225,13 @@ def config():
             start_time = timeit.default_timer()
             valid_words = find_inter(words, word_candidates)
             print(timeit.default_timer() - start_time)
-            global score
-            score = {}
+            global grouped
+            grouped = {}
             if valid_words != 'NONE':
-                score = score_calc(valid_words, language)
-
+                scores = score_calc(valid_words, language)
+                grouped = group_by_score(scores)
             else:
-                score['Number of valid words found'] = 0
+                grouped['Number of valid words found'] = 0
         return redirect(url_for('index'))
     return render_template('config.html', title='Configuration', form=form)
 
