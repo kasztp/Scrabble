@@ -43,8 +43,8 @@ def build_tileset(lang):
     if lang == 'EN':
         tile_set = ['a']*9 + ['b']*2 + ['c']*2 + ['d']*4 + ['e']*12 + ['f']*2 + ['g']*3 + ['h']*2 + ['i']*9 + ['j'] +\
                    ['k'] + ['l']*4 + ['m']*2 + ['n']*6 + ['o']*8 + ['p']*2 + ['q'] + ['r']*6 + ['s']*4 + ['t']*6 +\
-                   ['u']*4 + ['v']*2 + ['w']*2 + ['x'] + ['y']*2 + ['z']
-        if len(tile_set) == 98:
+                   ['u']*4 + ['v']*2 + ['w']*2 + ['x'] + ['y']*2 + ['z'] + ['BLANK']*2
+        if len(tile_set) == 100:
             print('Tile set generated OK!')
             return tile_set
         else:
@@ -69,7 +69,16 @@ def build_tileset(lang):
 def draw(tileset, n):
     if n >= 1:
         own_tiles = random.sample(tileset,k=n)
-        print('Tiles drawn: {}'.format(own_tiles))
+        hasblank = own_tiles.count('BLANK')
+        if hasblank >= 1:
+            for i in range(hasblank):
+                tileset.remove('BLANK')
+            for character in own_tiles:
+                tileset.remove(character)
+            own_tiles += random.sample(tileset, k=hasblank)
+            print('Tiles drawn: {}'.format(own_tiles))
+        else:
+            print('Tiles drawn: {}'.format(own_tiles))
         return own_tiles
     else:
         print('ERROR: Tile number less than 1!')
@@ -83,7 +92,7 @@ def word_gen(owntiles, l, s):
             permutations = set(itertools.permutations(owntiles, r=l))
             textperm = []
             for element in permutations:
-                textperm += [''.join(element)]
+                    textperm += [''.join(element)]
             print('Possible {} length words generated: {}'.format(l, len(textperm)))
             return textperm
         else:
@@ -100,8 +109,8 @@ def word_gen(owntiles, l, s):
 
 
 # intersection test
-def find_inter(ws, wc):
-    results = set(ws).intersection(wc)
+def find_inter(wset, wcandidates):
+    results = set(wset).intersection(wcandidates)
     if results != set():
         print(results)
         print('Number of valid words: {}'.format(len(results)))
@@ -121,12 +130,13 @@ def score_calc(words, lang):
             characters_en.update(dict.fromkeys(["k"], 5))
             characters_en.update(dict.fromkeys(["j", "x"], 8))
             characters_en.update(dict.fromkeys(["q", "z"], 10))
+            characters_en.update(dict.fromkeys(["BLANK"], 0))
             # print(characters_en)
             scores = {}
             for word in words:
                 value = 0
                 for character in word:
-                    value += characters_en.get(character)
+                    value += characters_en.get(character, 0)
                 scores[word] = value
             print(scores)
             return scores
@@ -139,21 +149,22 @@ def score_calc(words, lang):
                 characters_en.update(dict.fromkeys(["ő", "ú", "ű"], 7))
                 #characters_en.update(dict.fromkeys(["ly", "zs"], 8))
                 #characters_en.update(dict.fromkeys(["ty"], 10))
+                characters_en.update(dict.fromkeys(["BLANK"], 0))
                 # print(characters_en)
                 scores = {}
                 for word in words:
                     value = 0
                     for character in word:
-                        value += characters_en.get(character)
+                        value += characters_en.get(character, 0)
                     scores[word] = value
                 print(scores)
                 return scores
         else:
             print('ERROR: Unsupported Language: {}'.format(lang))
-            return 1
+            return 'NONE'
     else:
         print('ERROR: NO valid words given!')
-        return 1
+        return 'NONE'
 
 
 def group_by_score(scores):
@@ -173,7 +184,6 @@ def group_by_score(scores):
 
 def calc_best_hand(tiles):
     start_time = timeit.default_timer()
-
     print(timeit.default_timer() - start_time)
 
 
@@ -215,7 +225,18 @@ def config():
             tiles = build_tileset(language)
             if form.own_tileset.data:
                 tile_draw = []
-                for c in form.own_tileset.data:
+                hasblank = form.own_tileset.data.count('BLANK')
+                if hasblank >= 1:
+                    for i in range(hasblank):
+                        own_tileset = form.own_tileset.data.replace('BLANK','')
+                    for character in own_tileset:
+                        tiles.remove(character)
+                    own_tileset += str(random.sample(tiles, k=hasblank))
+                    print('Tiles drawn: {}'.format(own_tileset))
+                else:
+                    own_tileset = form.own_tileset.data
+                    print('Tiles drawn: {}'.format(own_tileset))
+                for c in own_tileset:
                     tile_draw += [c]
             else:
                 tile_draw = draw(tiles, 7)
@@ -231,7 +252,7 @@ def config():
                 scores = score_calc(valid_words, language)
                 grouped = group_by_score(scores)
             else:
-                grouped['Number of valid words found'] = 0
+                grouped = {0: 'Number of valid words found'}
         return redirect(url_for('index'))
     return render_template('config.html', title='Configuration', form=form)
 
