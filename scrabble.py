@@ -89,11 +89,10 @@ def draw(tileset, n):
 # Generate possible words (tile permutations)
 def word_gen(owntiles, l, s):
     if l >= 2:
-        textperm = []
+        textperm = set()
         permutations = {}
         if s:
             permutations = itertools.permutations(owntiles, r=l)
-            textperm = set()
             for element in permutations:
                     textperm.add(''.join(element))
             print('Possible {} length words generated: {}'.format(l, len(textperm)))
@@ -102,10 +101,11 @@ def word_gen(owntiles, l, s):
             for i in range(2, (l+1)):
                 permutations = itertools.permutations(owntiles, r=i)
                 textperm_i = set()
+                print('Permutations: {}'.format(permutations))
                 for element in permutations:
                     textperm_i.add(''.join(element))
                 print('Possible {} length words generated: {}'.format(i, len(textperm_i)))
-                textperm += textperm_i
+                textperm |= textperm_i
             return textperm
     else:
         print('ERROR: Word length parameter less than 2!')
