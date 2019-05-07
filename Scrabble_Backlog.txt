@@ -1,0 +1,69 @@
+-----------------------------
+BUGS:
+
+B01: FIXED
+Description:	/index page fails if there are no valid words to display in table.
+Error Msg:
+  File "C:\Users\kaszt\PycharmProjects\Scrabble\templates\index.html", line 15, in block "content"
+    <td>{{ score }}</td><td>{% for w in v %}{{ w }} | {% endfor %}</td>
+TypeError: 'int' object is not iterable
+
+B02: FIXED
+Description:	/index scorecalc fails if string comtains BLANK values.
+Error Msg:
+File "C:\Users\kaszt\PycharmProjects\Scrabble\scrabble.py", line 137, in score_calc
+value += characters_en.get(character)
+TypeError: unsupported operand type(s) for +=: 'int' and 'NoneType'
+
+B04:
+Description: /config memory limitation?
+Error Msg:
+  File "C:\Users\kaszt\PycharmProjects\Scrabble\scrabble.py", line 265, in config
+    word_candidates = word_gen(tile_draw, max_word_length, form.only_max.data)
+  File "C:\Users\kaszt\PycharmProjects\Scrabble\scrabble.py", line 106, in word_gen
+    textperm_i.add(''.join(element))
+MemoryError
+Other:
+Input: EN + 7 + flowerBLANK
+Output:
+Tile set generated OK!
+flowerlncgzvhjubkfxwameyqiosrdtp
+Tiles drawn: ['f', 'l', 'o', 'w', 'e', 'r', 'l', 'n', 'c', 'g', 'z', 'v', 'h', 'j', 'u', 'b', 'k', 'f', 'x', 'w', 'a', 'm', 'e', 'y', 'q', 'i', 'o', 's', 'r', 'd', 't', 'p']
+Possible 2 length words generated: 656
+Possible 3 length words generated: 16050
+Possible 4 length words generated: 380490
+Possible 5 length words generated: 8732400
+
+-----------------------------
+
+FEATURES:
+
+F00:
+Desciption: Fix /index GUI for 'NO valid words found' use case.
+Dependency: None
+
+F01: PARTIAL
+Description: HU double character support.
+Dependency: None
+
+F02:
+Description: Optimum Hand calculation.
+Dependency: F01
+
+F03:
+Description: Scabble Table representation.
+Dependency:	None
+
+F04:
+Description: Extend Word generator to generate based on an already populated table + drawn tiles.
+Dependency: F01, F03
+
+F05:
+Description: Extend Score Calculation to take 'table field multipliers' into account
+Dependency:	F04
+
+F06:
+Description: WEB GUI for Scabble Table
+Dependency: F03
+
+-----------------------------

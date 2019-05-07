@@ -51,10 +51,12 @@ def build_tileset(lang):
             print('ERROR: Tile set generation error with length: {}'.format(len(tile_set)))
             return len(tile_set)
     elif lang == 'HU':
-        tile_set = ['a'] * 6 + ['b'] * 3 + ['c'] + ['d'] * 3 + ['e'] * 6 + ['f'] * 2 + ['g'] * 3 + ['h'] * 2 + ['i'] * 3 + ['j'] * 2 + \
-                   ['k'] * 6 + ['l'] * 4 + ['m'] * 3 + ['n'] * 4 + ['o'] * 3 + ['p'] * 2 + ['á'] * 4 + ['r'] * 4 + ['s'] * 3 + ['t'] * 5 + \
-                   ['u'] * 2 + ['v'] * 2 + ['é'] * 3 + ['í'] + ['ó'] * 3 + ['z'] * 2 + ['ö'] * 2 + ['ő'] + ['ú'] + ['ü'] * 2 + ['ű']
-        if len(tile_set) == 89:
+        tile_set = ['a'] * 6 + ['b'] * 3 + ['c'] + ['d'] * 3 + ['e'] * 6 + ['f'] * 2 + ['g'] * 3 + ['h'] * 2 + \
+                   ['i'] * 3 + ['j'] * 2 + ['k'] * 6 + ['l'] * 4 + ['m'] * 3 + ['n'] * 4 + ['o'] * 3 + ['p'] * 2 + \
+                   ['á'] * 4 + ['r'] * 4 + ['s'] * 3 + ['t'] * 5 + ['u'] * 2 + ['v'] * 2 + ['é'] * 3 + ['í'] + \
+                   ['ó'] * 3 + ['z'] * 2 + ['ö'] * 2 + ['ő'] + ['ú'] + ['ü'] * 2 + ['ű'] + ['sz'] * 2 + ['gy'] * 2 + \
+                   ['ny'] + ['cs'] + ['ly'] + ['zs'] + ['ty'] + ['BLANK'] * 2
+        if len(tile_set) == 100:
             print('Tile set generated OK!')
             return tile_set
         else:
@@ -68,7 +70,7 @@ def build_tileset(lang):
 # Draw n number of random tiles from the tile set
 def draw(tileset, n):
     if n >= 1:
-        own_tiles = random.sample(tileset,k=n)
+        own_tiles = random.sample(tileset, k=n)
         hasblank = own_tiles.count('BLANK')
         if hasblank >= 1:
             for i in range(hasblank):
@@ -88,19 +90,20 @@ def draw(tileset, n):
 def word_gen(owntiles, l, s):
     if l >= 2:
         textperm = []
+        permutations = {}
         if s:
-            permutations = set(itertools.permutations(owntiles, r=l))
-            textperm = []
+            permutations = itertools.permutations(owntiles, r=l)
+            textperm = set()
             for element in permutations:
-                    textperm += [''.join(element)]
+                    textperm.add(''.join(element))
             print('Possible {} length words generated: {}'.format(l, len(textperm)))
             return textperm
         else:
             for i in range(2, (l+1)):
-                permutations = set(itertools.permutations(owntiles, r=i))
-                textperm_i = []
+                permutations = itertools.permutations(owntiles, r=i)
+                textperm_i = set()
                 for element in permutations:
-                    textperm_i += [''.join(element)]
+                    textperm_i.add(''.join(element))
                 print('Possible {} length words generated: {}'.format(i, len(textperm_i)))
                 textperm += textperm_i
             return textperm
@@ -143,12 +146,12 @@ def score_calc(words, lang):
         elif lang == 'HU':
                 characters_en = dict.fromkeys(["i", "m", "o", "s", "á", "l", "n", "r", "t", "a", "e", "k"], 1)
                 characters_en.update(dict.fromkeys(["b", "d", "g", "ó"], 2))
-                characters_en.update(dict.fromkeys(["h", "v", "é"], 3))
-                characters_en.update(dict.fromkeys(["f", "j", "ö", "p", "u", "ü", "z"], 4))
-                characters_en.update(dict.fromkeys(["c", "í"], 5))
-                characters_en.update(dict.fromkeys(["ő", "ú", "ű"], 7))
-                #characters_en.update(dict.fromkeys(["ly", "zs"], 8))
-                #characters_en.update(dict.fromkeys(["ty"], 10))
+                characters_en.update(dict.fromkeys(["h", "v", "é", "sz"], 3))
+                characters_en.update(dict.fromkeys(["f", "j", "ö", "p", "u", "ü", "z", "gy"], 4))
+                characters_en.update(dict.fromkeys(["c", "í", "ny"], 5))
+                characters_en.update(dict.fromkeys(["ő", "ú", "ű", "cs"], 7))
+                characters_en.update(dict.fromkeys(["ly", "zs"], 8))
+                characters_en.update(dict.fromkeys(["ty"], 10))
                 characters_en.update(dict.fromkeys(["BLANK"], 0))
                 # print(characters_en)
                 scores = {}
@@ -223,23 +226,41 @@ def config():
                 print('ERROR: Unsupported Language!')
             max_word_length = int(request.form['max_word_length'])
             tiles = build_tileset(language)
+            tile_draw = []
             if form.own_tileset.data:
-                tile_draw = []
+                #own_tileset = []
                 hasblank = form.own_tileset.data.count('BLANK')
                 if hasblank >= 1:
-                    for i in range(hasblank):
-                        own_tileset = form.own_tileset.data.replace('BLANK','')
-                    for character in own_tileset:
-                        tiles.remove(character)
-                    own_tileset += str(random.sample(tiles, k=hasblank))
-                    print('Tiles drawn: {}'.format(own_tileset))
+                    form.own_tileset.data = form.own_tileset.data.replace('BLANK', '')
+                #                    for character in own_tileset:
+                #                        print(character)
+                #                        tile_draw += [character]
+                for i in range(hasblank):
+                    for element in set(tiles[0:-2]):
+                        form.own_tileset.data += str(element)
+                print(form.own_tileset.data)
+                if language == 'HU':
+                    global hasdigraph
+                    hasdigraph = 0
+                    digraph_count = 0
+                    digraphs = []
+                    for digraph in ('cs', 'gy', 'sz', 'zs', 'ty', 'ly', 'ny'):
+                        if digraph in form.own_tileset.data:
+                            digraph_count += form.own_tileset.data.count(digraph)
+                            for i in range(digraph_count):
+                                hasdigraph += 1
+                                #tiles.remove(digraph)
+                                digraphs += digraph
+                            form.own_tileset.data.replace(digraph, '')
+                    for character in form.own_tileset.data:
+                        tile_draw += [character]
+                    tile_draw += digraphs
                 else:
-                    own_tileset = form.own_tileset.data
-                    print('Tiles drawn: {}'.format(own_tileset))
-                for c in own_tileset:
-                    tile_draw += [c]
+                    for character in form.own_tileset.data:
+                        tile_draw += [character]
             else:
                 tile_draw = draw(tiles, 7)
+            print('Tiles drawn: {}'.format(tile_draw))
             flash('Tiles: {}'.format(tile_draw))
             word_candidates = word_gen(tile_draw, max_word_length, form.only_max.data)
             # intersection test
