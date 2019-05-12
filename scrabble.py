@@ -1,6 +1,9 @@
 import random
 import itertools
+import multiprocessing
 import timeit
+import tqdm
+from math import factorial
 from flask import Flask, render_template, flash, redirect, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, RadioField, BooleanField, SubmitField
@@ -10,16 +13,40 @@ from flask_bootstrap import Bootstrap
 
 filename = 'words.txt'  # SCOWL-wl en_US word list
 db = open(filename, encoding='utf-8')
-EN_words = db.read().splitlines()
+EN_words = set(db.read().splitlines())
 db.close()
 
 filename = 'szavak.txt'  # https://sourceforge.net/projects/wordlist-hu/ hu_HU word list
 db = open(filename, encoding='utf-8')
-HU_words = db.read().splitlines()
+HU_words = set(db.read().splitlines())
 db.close()
 
 scores = {}
 grouped = {}
+
+
+def finder(perm):
+    temp = ''.join(perm)
+    if temp in EN_words:
+        return temp
+    else:
+        return ()
+
+
+def finder_HU(perm):
+    temp = ''.join(perm)
+    if temp in HU_words:
+        return temp
+    else:
+        return ()
+
+
+def finder_EN(perm):
+    temp = ''.join(perm)
+    if temp in EN_words:
+        return temp
+    else:
+        return ()
 
 
 def find_word(word, lang):
@@ -87,25 +114,92 @@ def draw(tileset, n):
 
 
 # Generate possible words (tile permutations)
-def word_gen(owntiles, l, s):
+def word_gen_st(owntiles, l, s):
     if l >= 2:
         textperm = set()
-        permutations = {}
+        #permutations = set()
         if s:
-            permutations = itertools.permutations(owntiles, r=l)
-            for element in permutations:
-                    textperm.add(''.join(element))
+            #for i in set(map(''.join, itertools.permutations(owntiles, r=i))):
+            #    tempfile.write("%s\r" % i)
+            textperm = set(map(''.join, itertools.permutations(owntiles, r=l)))
+            #print('Permutations: {}'.format(permutations))
+            #for element in permutations:
+            #        textperm.add(''.join(element))
             print('Possible {} length words generated: {}'.format(l, len(textperm)))
             return textperm
         else:
+            textperm_i = set()
             for i in range(2, (l+1)):
-                permutations = itertools.permutations(owntiles, r=i)
-                textperm_i = set()
-                print('Permutations: {}'.format(permutations))
-                for element in permutations:
-                    textperm_i.add(''.join(element))
+                #textperm_i = set(map(''.join, itertools.permutations(owntiles, r=i)))
+                if (len(owntiles) > 20) & (l > 5):
+                    tempfile = open("permutations.temp", "a+")
+                    for word in set(map(''.join, itertools.permutations(owntiles, r=i))):
+                        tempfile.write("%s\r" % word)
+                    tempfile.close()
+                #textperm_i = set()
+                #print('Permutations: {}'.format(permutations))
+                #for element in permutations:
+                #textperm_i.add(permutations)
                 print('Possible {} length words generated: {}'.format(i, len(textperm_i)))
-                textperm |= textperm_i
+                #textperm |= textperm_i
+            return textperm
+    else:
+        print('ERROR: Word length parameter less than 2!')
+
+
+def word_gen_mt(owntiles, l, s, lang):
+    if l >= 2:
+        if s:
+            if __name__ == "__main__":
+                start_time = timeit.default_timer()
+                print("Estimating batch length...")
+                pool = multiprocessing.Pool(processes=8)
+                length = factorial(len(owntiles)) // factorial(len(owntiles) - l)
+                print(length)
+                if l <= 4:
+                    chunksize = 1000
+                elif l == 5:
+                    chunksize = 10000
+                else:
+                    chunksize = 20000
+                values = itertools.permutations(owntiles, r=l)
+                print(timeit.default_timer() - start_time)
+                if lang == 'EN':
+                    results = set(tqdm.tqdm(pool.imap_unordered(finder_EN, values, chunksize=chunksize), total=length))
+                if lang == 'HU':
+                    results = set(tqdm.tqdm(pool.imap_unordered(finder_HU, values, chunksize=chunksize), total=length))
+                pool.close()
+                pool.join()
+            print('Unique {} length words generated: {}'.format(l, len(results)))
+            return results
+        else:
+            textperm = set()
+            for i in range(2, (l+1)):
+                if __name__ == "__main__":
+                    start_time = timeit.default_timer()
+                    print("Estimating batch length...")
+                    pool = multiprocessing.Pool(processes=8)
+                    length = factorial(len(owntiles)) // factorial(len(owntiles)-i)
+                    print(length)
+                    if i <= 4:
+                        chunksize = 1000
+                    elif i == 5:
+                        chunksize = 10000
+                    else:
+                        chunksize = 20000
+                    values = itertools.permutations(owntiles, r=i)
+                    print(timeit.default_timer() - start_time)
+                    if lang == 'EN':
+                        results = set(tqdm.tqdm(pool.imap_unordered(finder_EN, values, chunksize=chunksize), total=length))
+                    if lang == 'HU':
+                        results = set(tqdm.tqdm(pool.imap_unordered(finder_HU, values, chunksize=chunksize), total=length))
+                    pool.close()
+                    pool.join()
+                    #with multiprocessing.Pool(processes=8) as pool:
+                    #    results = pool.map(finder, map(''.join, itertools.permutations(owntiles, r=i)), chunksize=1000)
+                print('Unique {} length words generated: {}'.format(i, len(results)))
+                textperm |= results
+                print('Unique words generated so far: {}'.format(len(textperm)))
             return textperm
     else:
         print('ERROR: Word length parameter less than 2!')
@@ -137,10 +231,11 @@ def score_calc(words, lang):
             # print(characters_en)
             scores = {}
             for word in words:
-                value = 0
-                for character in word:
-                    value += characters_en.get(character, 0)
-                scores[word] = value
+                if word != ():
+                    value = 0
+                    for character in word:
+                        value += characters_en.get(character, 0)
+                    scores[word] = value
             print(scores)
             return scores
         elif lang == 'HU':
@@ -156,10 +251,11 @@ def score_calc(words, lang):
                 # print(characters_en)
                 scores = {}
                 for word in words:
-                    value = 0
-                    for character in word:
-                        value += characters_en.get(character, 0)
-                    scores[word] = value
+                    if word != ():
+                        value = 0
+                        for character in word:
+                            value += characters_en.get(character, 0)
+                        scores[word] = value
                 print(scores)
                 return scores
         else:
@@ -249,7 +345,6 @@ def config():
                             digraph_count += form.own_tileset.data.count(digraph)
                             for i in range(digraph_count):
                                 hasdigraph += 1
-                                #tiles.remove(digraph)
                                 digraphs += digraph
                             form.own_tileset.data.replace(digraph, '')
                     for character in form.own_tileset.data:
@@ -260,13 +355,10 @@ def config():
                         tile_draw += [character]
             else:
                 tile_draw = draw(tiles, 7)
+            #tile_draw = tuple(tile_draw)
             print('Tiles drawn: {}'.format(tile_draw))
             flash('Tiles: {}'.format(tile_draw))
-            word_candidates = word_gen(tile_draw, max_word_length, form.only_max.data)
-            # intersection test
-            start_time = timeit.default_timer()
-            valid_words = find_inter(words, word_candidates)
-            print(timeit.default_timer() - start_time)
+            valid_words = word_gen_mt(tile_draw, max_word_length, form.only_max.data, language)
             global grouped
             grouped = {}
             if valid_words != 'NONE':

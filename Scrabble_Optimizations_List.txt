@@ -1,0 +1,144 @@
+INITIAL:
+127.0.0.1 - - [11/May/2019 23:13:47] "GET /config HTTP/1.1" 200 -
+Tile set generated OK!
+flowerzmenrikftgobucxvashwdplqyj
+Tiles drawn: ['f', 'l', 'o', 'w', 'e', 'r', 'z', 'm', 'e', 'n', 'r', 'i', 'k', 'f', 't', 'g', 'o', 'b', 'u', 'c', 'x', 'v', 'a', 's', 'h', 'w', 'd', 'p', 'l', 'q', 'y', 'j']
+100%|██████████| 992/992 [00:05<00:00, 179.04it/s]
+Unique 2 length words generated: 446
+Unique words generated so far: 446
+7.319999999921833e-05
+100%|██████████| 29760/29760 [01:08<00:00, 433.60it/s]
+Unique 3 length words generated: 2139
+Unique words generated so far: 2584
+0.00016890000000557848
+100%|██████████| 863040/863040 [41:20<00:00, 347.89it/s]
+Unique 4 length words generated: 6605
+Unique words generated so far: 9188
+0.00040499999977328116
+  6%|▌         | 1350001/24165120
+  
+Word dictionaries converted from list to set():
+
+127.0.0.1 - - [12/May/2019 13:35:56] "GET /config HTTP/1.1" 200 -
+Tile set generated OK!
+flowerepiojlzdarfuvcxtynsbqmkwgh
+Tiles drawn: ['f', 'l', 'o', 'w', 'e', 'r', 'e', 'p', 'i', 'o', 'j', 'l', 'z', 'd', 'a', 'r', 'f', 'u', 'v', 'c', 'x', 't', 'y', 'n', 's', 'b', 'q', 'm', 'k', 'w', 'g', 'h']
+100%|██████████| 992/992 [00:00<00:00, 1205.64it/s]
+Unique 2 length words generated: 446
+Unique words generated so far: 446
+4.350000000030718e-05
+100%|██████████| 29760/29760 [00:00<00:00, 35271.40it/s]
+Unique 3 length words generated: 2139
+Unique words generated so far: 2584
+0.00010800000000088517
+100%|██████████| 863040/863040 [00:01<00:00, 627726.30it/s]
+Unique 4 length words generated: 6605
+Unique words generated so far: 9188
+0.0004969999999993036
+100%|██████████| 24165120/24165120 [00:23<00:00, 1018415.57it/s]
+Unique 5 length words generated: 13306
+Unique words generated so far: 22493
+0.0015399999999985425
+100%|██████████| 652458240/652458240 [08:45<00:00, 1242601.75it/s]
+Unique 6 length words generated: 20872
+Unique words generated so far: 43364
+0.002493500000014137
+
+Chunksize: 1000:10000:100000:
+
+Tile set generated OK!
+floweroxcykpwfmvdznrbqgahuseltij
+Tiles drawn: ['f', 'l', 'o', 'w', 'e', 'r', 'o', 'x', 'c', 'y', 'k', 'p', 'w', 'f', 'm', 'v', 'd', 'z', 'n', 'r', 'b', 'q', 'g', 'a', 'h', 'u', 's', 'e', 'l', 't', 'i', 'j']
+Estimating batch length...
+  0%|          | 0/992 [00:00<?, ?it/s]0.07344249999999963
+100%|██████████| 992/992 [00:00<00:00, 1247.19it/s]
+Unique 2 length words generated: 446
+Unique words generated so far: 446
+Estimating batch length...
+0.08130089999999957
+100%|██████████| 29760/29760 [00:00<00:00, 37160.16it/s]
+Unique 3 length words generated: 2139
+Unique words generated so far: 2584
+Estimating batch length...
+0.34697590000000034
+100%|██████████| 863040/863040 [00:01<00:00, 687783.78it/s]
+Unique 4 length words generated: 6605
+Unique words generated so far: 9188
+Estimating batch length...
+2.3220717000000004
+100%|██████████| 24165120/24165120 [00:17<00:00, 1411433.36it/s]
+Unique 5 length words generated: 13306
+Unique words generated so far: 22493
+Estimating batch length...
+48.7887911
+ 70%|███████   | 456993613/652458240 [09:50<04:17, 758984.81it/s]
+ 
+Chunksize: 1000:10000:20000:
+
+Tile set generated OK!
+flowerevbiaflwrzxohdcqjsupnmtkyg
+Tiles drawn: ['f', 'l', 'o', 'w', 'e', 'r', 'e', 'v', 'b', 'i', 'a', 'f', 'l', 'w', 'r', 'z', 'x', 'o', 'h', 'd', 'c', 'q', 'j', 's', 'u', 'p', 'n', 'm', 't', 'k', 'y', 'g']
+Estimating batch length...
+0.07245840000000037
+100%|██████████| 992/992 [00:00<00:00, 1217.44it/s]
+Unique 2 length words generated: 446
+Unique words generated so far: 446
+Estimating batch length...
+  0%|          | 0/29760 [00:00<?, ?it/s]0.04757640000000052
+100%|██████████| 29760/29760 [00:00<00:00, 34417.00it/s]
+Unique 3 length words generated: 2139
+Unique words generated so far: 2584
+Estimating batch length...
+0.31874859999999927
+100%|██████████| 863040/863040 [00:01<00:00, 642959.69it/s]
+Unique 4 length words generated: 6605
+Unique words generated so far: 9188
+Estimating batch length...
+2.3572238000000016
+100%|██████████| 24165120/24165120 [00:17<00:00, 1398581.57it/s]
+Unique 5 length words generated: 13306
+Unique words generated so far: 22493
+Estimating batch length...
+48.183318400000005
+100%|██████████| 652458240/652458240 [08:47<00:00, 1237460.09it/s]
+Unique 6 length words generated: 20872
+Unique words generated so far: 43364
+Estimating batch length...
+
+Length calculation for tqdm changed to factorials instead of counting iterator:
+
+Tile set generated OK!
+flowerafqxcwkmznthjpvslrbgdiouey
+Tiles drawn: ['f', 'l', 'o', 'w', 'e', 'r', 'a', 'f', 'q', 'x', 'c', 'w', 'k', 'm', 'z', 'n', 't', 'h', 'j', 'p', 'v', 's', 'l', 'r', 'b', 'g', 'd', 'i', 'o', 'u', 'e', 'y']
+Estimating batch length...
+  0%|          | 0/992 [00:00<?, ?it/s]992
+0.0803837999999999
+100%|██████████| 992/992 [00:00<00:00, 1277.41it/s]
+Unique 2 length words generated: 446
+Unique words generated so far: 446
+Estimating batch length...
+  0%|          | 0/29760 [00:00<?, ?it/s]29760
+0.044713400000000014
+100%|██████████| 29760/29760 [00:00<00:00, 35800.25it/s]
+Unique 3 length words generated: 2139
+Unique words generated so far: 2584
+Estimating batch length...
+863040
+0.04637419999999892
+100%|██████████| 863040/863040 [00:01<00:00, 593462.26it/s]
+Unique 4 length words generated: 6605
+Unique words generated so far: 9188
+Estimating batch length...
+24165120
+0.04486600000000074
+100%|██████████| 24165120/24165120 [00:18<00:00, 1300331.01it/s]
+Unique 5 length words generated: 13306
+Unique words generated so far: 22493
+Estimating batch length...
+652458240
+0.055754699999997825
+100%|██████████| 652458240/652458240 [08:30<00:00, 1278902.19it/s]
+Unique 6 length words generated: 20872
+Unique words generated so far: 43364
+Estimating batch length...
+  0%|          | 0/16963914240 [00:00<?, ?it/s]16963914240
