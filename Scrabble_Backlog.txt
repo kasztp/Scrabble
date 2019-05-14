@@ -15,7 +15,7 @@ File "C:\Users\kaszt\PycharmProjects\Scrabble\scrabble.py", line 137, in score_c
 value += characters_en.get(character)
 TypeError: unsupported operand type(s) for +=: 'int' and 'NoneType'
 
-B04:
+B03: FIXED
 Description: /config memory limitation?
 Error Msg:
   File "C:\Users\kaszt\PycharmProjects\Scrabble\scrabble.py", line 265, in config
@@ -38,7 +38,7 @@ Possible 5 length words generated: 8732400
 
 FEATURES:
 
-F00:
+F00: PARTIAL
 Desciption: Fix /index GUI for 'NO valid words found' use case.
 Dependency: None
 

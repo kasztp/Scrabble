@@ -25,14 +25,6 @@ scores = {}
 grouped = {}
 
 
-def finder(perm):
-    temp = ''.join(perm)
-    if temp in EN_words:
-        return temp
-    else:
-        return ()
-
-
 def finder_HU(perm):
     temp = ''.join(perm)
     if temp in HU_words:
@@ -47,22 +39,6 @@ def finder_EN(perm):
         return temp
     else:
         return ()
-
-
-def find_word(word, lang):
-    if lang == 'EN':
-        if word in EN_words:
-            return word
-        else:
-            return ()
-    elif lang == 'HU':
-        if word in HU_words:
-            return word
-        else:
-            return ()
-    #    print('{} found in word database!'.format(word))
-    # else:
-    #     print('{} NOT found in word database!'.format(word))
 
 
 # Build language specific tile set - without the 2 blanks
@@ -114,46 +90,14 @@ def draw(tileset, n):
 
 
 # Generate possible words (tile permutations)
-def word_gen_st(owntiles, l, s):
-    if l >= 2:
-        textperm = set()
-        #permutations = set()
-        if s:
-            #for i in set(map(''.join, itertools.permutations(owntiles, r=i))):
-            #    tempfile.write("%s\r" % i)
-            textperm = set(map(''.join, itertools.permutations(owntiles, r=l)))
-            #print('Permutations: {}'.format(permutations))
-            #for element in permutations:
-            #        textperm.add(''.join(element))
-            print('Possible {} length words generated: {}'.format(l, len(textperm)))
-            return textperm
-        else:
-            textperm_i = set()
-            for i in range(2, (l+1)):
-                #textperm_i = set(map(''.join, itertools.permutations(owntiles, r=i)))
-                if (len(owntiles) > 20) & (l > 5):
-                    tempfile = open("permutations.temp", "a+")
-                    for word in set(map(''.join, itertools.permutations(owntiles, r=i))):
-                        tempfile.write("%s\r" % word)
-                    tempfile.close()
-                #textperm_i = set()
-                #print('Permutations: {}'.format(permutations))
-                #for element in permutations:
-                #textperm_i.add(permutations)
-                print('Possible {} length words generated: {}'.format(i, len(textperm_i)))
-                #textperm |= textperm_i
-            return textperm
-    else:
-        print('ERROR: Word length parameter less than 2!')
-
-
 def word_gen_mt(owntiles, l, s, lang):
     if l >= 2:
+        workers = multiprocessing.cpu_count()
         if s:
             if __name__ == "__main__":
                 start_time = timeit.default_timer()
                 print("Estimating batch length...")
-                pool = multiprocessing.Pool(processes=8)
+                pool = multiprocessing.Pool(processes=workers)
                 length = factorial(len(owntiles)) // factorial(len(owntiles) - l)
                 print(length)
                 if l <= 4:
@@ -178,7 +122,7 @@ def word_gen_mt(owntiles, l, s, lang):
                 if __name__ == "__main__":
                     start_time = timeit.default_timer()
                     print("Estimating batch length...")
-                    pool = multiprocessing.Pool(processes=8)
+                    pool = multiprocessing.Pool(processes=workers)
                     length = factorial(len(owntiles)) // factorial(len(owntiles)-i)
                     print(length)
                     if i <= 4:
@@ -186,7 +130,7 @@ def word_gen_mt(owntiles, l, s, lang):
                     elif i == 5:
                         chunksize = 10000
                     else:
-                        chunksize = 20000
+                        chunksize = 10000
                     values = itertools.permutations(owntiles, r=i)
                     print(timeit.default_timer() - start_time)
                     if lang == 'EN':
@@ -195,26 +139,12 @@ def word_gen_mt(owntiles, l, s, lang):
                         results = set(tqdm.tqdm(pool.imap_unordered(finder_HU, values, chunksize=chunksize), total=length))
                     pool.close()
                     pool.join()
-                    #with multiprocessing.Pool(processes=8) as pool:
-                    #    results = pool.map(finder, map(''.join, itertools.permutations(owntiles, r=i)), chunksize=1000)
                 print('Unique {} length words generated: {}'.format(i, len(results)))
                 textperm |= results
                 print('Unique words generated so far: {}'.format(len(textperm)))
             return textperm
     else:
         print('ERROR: Word length parameter less than 2!')
-
-
-# intersection test
-def find_inter(wset, wcandidates):
-    results = set(wset).intersection(wcandidates)
-    if results != set():
-        print(results)
-        print('Number of valid words: {}'.format(len(results)))
-        return results
-    else:
-        print('NO valid words found!')
-        return 'NONE'
 
 
 def score_calc(words, lang):
@@ -239,25 +169,25 @@ def score_calc(words, lang):
             print(scores)
             return scores
         elif lang == 'HU':
-                characters_en = dict.fromkeys(["i", "m", "o", "s", "á", "l", "n", "r", "t", "a", "e", "k"], 1)
-                characters_en.update(dict.fromkeys(["b", "d", "g", "ó"], 2))
-                characters_en.update(dict.fromkeys(["h", "v", "é", "sz"], 3))
-                characters_en.update(dict.fromkeys(["f", "j", "ö", "p", "u", "ü", "z", "gy"], 4))
-                characters_en.update(dict.fromkeys(["c", "í", "ny"], 5))
-                characters_en.update(dict.fromkeys(["ő", "ú", "ű", "cs"], 7))
-                characters_en.update(dict.fromkeys(["ly", "zs"], 8))
-                characters_en.update(dict.fromkeys(["ty"], 10))
-                characters_en.update(dict.fromkeys(["BLANK"], 0))
-                # print(characters_en)
-                scores = {}
-                for word in words:
-                    if word != ():
-                        value = 0
-                        for character in word:
-                            value += characters_en.get(character, 0)
-                        scores[word] = value
-                print(scores)
-                return scores
+            characters_en = dict.fromkeys(["i", "m", "o", "s", "á", "l", "n", "r", "t", "a", "e", "k"], 1)
+            characters_en.update(dict.fromkeys(["b", "d", "g", "ó"], 2))
+            characters_en.update(dict.fromkeys(["h", "v", "é", "sz"], 3))
+            characters_en.update(dict.fromkeys(["f", "j", "ö", "p", "u", "ü", "z", "gy"], 4))
+            characters_en.update(dict.fromkeys(["c", "í", "ny"], 5))
+            characters_en.update(dict.fromkeys(["ő", "ú", "ű", "cs"], 7))
+            characters_en.update(dict.fromkeys(["ly", "zs"], 8))
+            characters_en.update(dict.fromkeys(["ty"], 10))
+            characters_en.update(dict.fromkeys(["BLANK"], 0))
+            # print(characters_en)
+            scores = {}
+            for word in words:
+                if word != ():
+                    value = 0
+                    for character in word:
+                        value += characters_en.get(character, 0)
+                    scores[word] = value
+            print(scores)
+            return scores
         else:
             print('ERROR: Unsupported Language: {}'.format(lang))
             return 'NONE'
@@ -293,7 +223,7 @@ bootstrap = Bootstrap(app)
 
 class ConfigForm(FlaskForm):
     language = RadioField('Language', choices=[('EN', 'English'),('HU', 'Hungarian')], validators=[DataRequired()])
-    max_word_length = RadioField('Max Word Length', choices=[(2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7')], coerce=int, validators=[DataRequired()])
+    max_word_length = RadioField('Max Word Length', choices=[(2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10'), (11, '11'), (12, '12'), (13, '13')], coerce=int, validators=[DataRequired()])
     own_tileset = StringField('Enter your own tiles here (without any breaks):')
     only_max = BooleanField('Only Max Length?')
     submit = SubmitField('Send')
@@ -328,9 +258,6 @@ def config():
                 hasblank = form.own_tileset.data.count('BLANK')
                 if hasblank >= 1:
                     form.own_tileset.data = form.own_tileset.data.replace('BLANK', '')
-                #                    for character in own_tileset:
-                #                        print(character)
-                #                        tile_draw += [character]
                 for i in range(hasblank):
                     for element in set(tiles[0:-2]):
                         form.own_tileset.data += str(element)
@@ -355,7 +282,6 @@ def config():
                         tile_draw += [character]
             else:
                 tile_draw = draw(tiles, 7)
-            #tile_draw = tuple(tile_draw)
             print('Tiles drawn: {}'.format(tile_draw))
             flash('Tiles: {}'.format(tile_draw))
             valid_words = word_gen_mt(tile_draw, max_word_length, form.only_max.data, language)
