@@ -41,7 +41,7 @@ def finder_EN(perm):
         return ()
 
 
-# Build language specific tile set - without the 2 blanks
+# Build language specific tile set
 def build_tileset(lang):
     if lang == 'EN':
         tile_set = ['a']*9 + ['b']*2 + ['c']*2 + ['d']*4 + ['e']*12 + ['f']*2 + ['g']*3 + ['h']*2 + ['i']*9 + ['j'] +\
