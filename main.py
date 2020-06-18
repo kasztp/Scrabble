@@ -1,16 +1,17 @@
 import random
 import itertools
 #import multiprocessing
-#import timeit
+import timeit
 #import tqdm
 import pandas as pd
-#from math import factorial
+from math import factorial
 from flask import Flask, render_template, flash, redirect, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, RadioField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
 from flask_bootstrap import Bootstrap
 
+pd.options.plotting.backend = "plotly"
 
 filename = 'words.txt'  # SCOWL-wl en_US word list
 db = open(filename, encoding='utf-8')
@@ -154,13 +155,14 @@ def word_gen_mt(owntiles, l, s, lang):
         print('ERROR: Word length parameter less than 2!')
 
 
+# HU version to be written:
 def checker(owntiles, dictionary, l):
     print(owntiles)
     valid_words = set()
-    #hasblank = owntiles.count('BLANK')
+    hasblank = owntiles.count('BLANK')
     if hasblank >= 1:
-        #print("Removing BLANK tiles...")
-        #owntiles = owntiles.replace('BLANK', '')
+        print("Removing BLANK tiles...")
+        owntiles = owntiles.replace('BLANK', '')
         print(owntiles)
         for word in dictionary:
             if len(word) == l:
@@ -176,6 +178,7 @@ def checker(owntiles, dictionary, l):
                         pass
                 if matches == l or matches == (l - hasblank):
                     valid_words.add(word)
+                    print(word)
     else:
         for word in dictionary:
             if len(word) == l:
@@ -197,24 +200,25 @@ def checker(owntiles, dictionary, l):
 
 def word_check(owntiles, l, s, lang):
     if l >= 2:
-        workers = multiprocessing.cpu_count()
+        results = set()
+        #workers = multiprocessing.cpu_count()
         if s:
-            if __name__ == "__main__":
-                print("Estimating batch length...")
-                length = len(EN_words)
-                print(length)
-                if lang == 'EN':
-                    results = set(checker(owntiles, EN_words, l))
-                if lang == 'HU':
-                    results = 'lol'
+            #if __name__ == "__main__":
+            print("Estimating batch length...")
+            length = len(EN_words)
+            print(length)
+            if lang == 'EN':
+                results = set(checker(owntiles, EN_words, l))
+            if lang == 'HU':
+                results = set(checker(owntiles, HU_words, l))
             print('Unique {} length words generated: {}'.format(l, len(results)))
             return results
         else:
             textperm = set()
             for i in range(2, (l+1)):
-                if __name__ == "__main__":
-                    start_time = timeit.default_timer()
-                    print("Estimating batch length...")
+                #if __name__ == "__main__":
+                start_time = timeit.default_timer()
+                print("Estimating batch length...")
                     #pool = multiprocessing.Pool(processes=workers)
                     #length = factorial(len(owntiles)) // factorial(len(owntiles)-i)
                     #print(length)
@@ -226,12 +230,14 @@ def word_check(owntiles, l, s, lang):
                     #    chunksize = 20000
                     #values = itertools.permutations(owntiles, r=i)
                     #print(timeit.default_timer() - start_time)
-                    if lang == 'EN':
+                if lang == 'EN':
                         #results = set(tqdm.tqdm(pool.imap_unordered(finder_EN, values, chunksize=chunksize), total=length))
-                        results = set(checker(owntiles, EN_words, i))
-                        print(timeit.default_timer() - start_time)
-                    if lang == 'HU':
-                        results = set(tqdm.tqdm(pool.imap_unordered(finder_HU, values, chunksize=chunksize), total=length))
+                    results = set(checker(owntiles, EN_words, i))
+                    print(timeit.default_timer() - start_time)
+                if lang == 'HU':
+                        #results = set(tqdm.tqdm(pool.imap_unordered(finder_HU, values, chunksize=chunksize), total=length))
+                    results = set(checker(owntiles, HU_words, i))
+                    print(timeit.default_timer() - start_time)
                     #pool.close()
                     #pool.join()
                 print('Unique {} length words generated: {}'.format(i, len(results)))
@@ -413,6 +419,11 @@ def config():
                 grouped = group_by_score(scores)
             else:
                 grouped = {0: 'Number of valid words found'}
+            df = pd.DataFrame.from_dict(grouped, orient='index')
+            print(df)
+            print(df.transpose().transpose())
+            plt = df.transpose().transpose().plot(kind='scatter')
+            plt.show()
         return redirect(url_for('index'))
     return render_template('config.html', title='Configuration', form=form)
 
