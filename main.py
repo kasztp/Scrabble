@@ -13,7 +13,7 @@ from flask_bootstrap import Bootstrap
 
 pd.options.plotting.backend = "plotly"
 
-filename = 'words.txt'  # SCOWL-wl en_US word list
+filename = 'Scrabble.txt'  # SCOWL-wl en_US word list
 db = open(filename, encoding='utf-8')
 EN_words = set(db.read().splitlines())
 db.close()
@@ -81,7 +81,7 @@ def build_tileset(lang):
 
 # Draw n number of random tiles from the tile set
 def draw(tileset, n):
-    if n >= 1:
+    if n >= 2:
         own_tiles = random.sample(tileset, k=n)
         #hasblank = own_tiles.count('BLANK')
         #if hasblank >= 1:
@@ -94,7 +94,7 @@ def draw(tileset, n):
         print('Tiles drawn: {}'.format(own_tiles))
         return own_tiles
     else:
-        print('ERROR: Tile number less than 1!')
+        print('ERROR: Tile number less than 2!')
 
 
 # Generate possible words (tile permutations)
@@ -159,10 +159,10 @@ def word_gen_mt(owntiles, l, s, lang):
 def checker(owntiles, dictionary, l):
     print(owntiles)
     valid_words = set()
-    hasblank = owntiles.count('BLANK')
+    #hasblank = owntiles.count('BLANK')
     if hasblank >= 1:
         print("Removing BLANK tiles...")
-        owntiles = owntiles.replace('BLANK', '')
+        #owntiles = owntiles.replace('BLANK', '')
         print(owntiles)
         for word in dictionary:
             if len(word) == l:
@@ -218,7 +218,7 @@ def word_check(owntiles, l, s, lang):
             for i in range(2, (l+1)):
                 #if __name__ == "__main__":
                 start_time = timeit.default_timer()
-                print("Estimating batch length...")
+                #print("Estimating batch length...")
                     #pool = multiprocessing.Pool(processes=workers)
                     #length = factorial(len(owntiles)) // factorial(len(owntiles)-i)
                     #print(length)
@@ -333,13 +333,13 @@ class ConfigForm(FlaskForm):
 @app.route('/')
 def root():
     user = {'username': 'Peter'}
-    return render_template('index.html', title='Home', user=user, scores=grouped)
+    return render_template('index.html', title='Home', user=user, scores=grouped, tiles=tile_draw, blanks=hasblank)
 
 
 @app.route('/index')
 def index():
     user = {'username': 'Peter'}
-    return render_template('index.html', title='Home', user=user, scores=grouped)
+    return render_template('index.html', title='Home', user=user, scores=grouped, tiles=tile_draw, blanks=hasblank)
 
 
 @app.route('/table')
@@ -375,6 +375,7 @@ def config():
                 print('ERROR: Unsupported Language!')
             max_word_length = int(request.form['max_word_length'])
             tiles = build_tileset(language)
+            global tile_draw
             tile_draw = []
             global hasblank
             if form.own_tileset.data:
@@ -406,11 +407,11 @@ def config():
                         tile_draw += [character]
             else:
                 tile_draw = draw(tiles, 7)
-                hasblank = form.own_tileset.data.count('BLANK')
+                hasblank = tile_draw.count('BLANK')
                 if hasblank >= 1:
-                    form.own_tileset.data = form.own_tileset.data.replace('BLANK', '')
+                    form.own_tileset.data = tile_draw.replace('BLANK', '')
             print('Tiles drawn: {}'.format(tile_draw))
-            #flash('Tiles: {}'.format(tile_draw))
+            flash('Tiles: {}'.format(tile_draw))
             valid_words = word_check(tile_draw, max_word_length, form.only_max.data, language)
             global grouped
             grouped = {}
@@ -420,10 +421,9 @@ def config():
             else:
                 grouped = {0: 'Number of valid words found'}
             df = pd.DataFrame.from_dict(grouped, orient='index')
-            print(df)
-            print(df.transpose().transpose())
-            plt = df.transpose().transpose().plot(kind='scatter')
-            plt.show()
+            print(df.transpose())
+            #plt = df.transpose().transpose().plot(kind='scatter')
+            #plt.show()
         return redirect(url_for('index'))
     return render_template('config.html', title='Configuration', form=form)
 
