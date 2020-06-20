@@ -1,19 +1,15 @@
 import random
-import itertools
-#import multiprocessing
 import timeit
-#import tqdm
 import pandas as pd
-from math import factorial
 from flask import Flask, render_template, flash, redirect, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, RadioField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
 from flask_bootstrap import Bootstrap
 
-pd.options.plotting.backend = "plotly"
 
-filename = 'Scrabble.txt'  # SCOWL-wl en_US word list
+# Load Word dictionary from files.
+filename = 'Scrabble.txt'  # Scrabble EN word list
 db = open(filename, encoding='utf-8')
 EN_words = set(db.read().splitlines())
 db.close()
@@ -27,35 +23,23 @@ scores = {}
 grouped = {}
 
 
-def finder_HU(perm):
-    temp = ''.join(perm)
-    if temp in HU_words:
-        return temp
-    else:
-        return ()
-
-
-def finder_EN(perm):
-    temp = ''.join(perm)
-    if temp in EN_words:
-        return temp
-    else:
-        return ()
-
-
+# Build Scrabble table representation as Pandas dataframe
 def build_table():
-    table = [['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O']]
+    table = [['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']]
     for i in range(15):
         table += [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
         df = pd.DataFrame(table)
     return df
 
-# Build language specific tile set - without the 2 blanks
+
+# Build language specific tile set
 def build_tileset(lang):
     if lang == 'EN':
-        tile_set = ['a']*9 + ['b']*2 + ['c']*2 + ['d']*4 + ['e']*12 + ['f']*2 + ['g']*3 + ['h']*2 + ['i']*9 + ['j'] +\
-                   ['k'] + ['l']*4 + ['m']*2 + ['n']*6 + ['o']*8 + ['p']*2 + ['q'] + ['r']*6 + ['s']*4 + ['t']*6 +\
-                   ['u']*4 + ['v']*2 + ['w']*2 + ['x'] + ['y']*2 + ['z'] + ['BLANK']*2
+        tile_set = ['a'] * 9 + ['b'] * 2 + ['c'] * 2 + ['d'] * 4 + ['e'] * 12 + ['f'] * 2 + ['g'] * 3 + ['h'] * 2 + [
+            'i'] * 9 + ['j'] + \
+                   ['k'] + ['l'] * 4 + ['m'] * 2 + ['n'] * 6 + ['o'] * 8 + ['p'] * 2 + ['q'] + ['r'] * 6 + ['s'] * 4 + [
+                       't'] * 6 + \
+                   ['u'] * 4 + ['v'] * 2 + ['w'] * 2 + ['x'] + ['y'] * 2 + ['z'] + ['BLANK'] * 2
         if len(tile_set) == 100:
             print('Tile set generated OK!')
             return tile_set
@@ -83,86 +67,17 @@ def build_tileset(lang):
 def draw(tileset, n):
     if n >= 2:
         own_tiles = random.sample(tileset, k=n)
-        #hasblank = own_tiles.count('BLANK')
-        #if hasblank >= 1:
-        #    tileset = tileset[:-2]
-        #    for character in own_tiles:
-        #        tileset.remove(character)
-        #    own_tiles += random.sample(set(tileset), k=hasblank)
-        #    print('Tiles drawn: {}'.format(own_tiles))
-        #else:
         print('Tiles drawn: {}'.format(own_tiles))
         return own_tiles
     else:
         print('ERROR: Tile number less than 2!')
 
 
-# Generate possible words (tile permutations)
-def word_gen_mt(owntiles, l, s, lang):
-    if l >= 2:
-        workers = multiprocessing.cpu_count()
-        if s:
-            if __name__ == "__main__":
-                start_time = timeit.default_timer()
-                print("Estimating batch length...")
-                pool = multiprocessing.Pool(processes=workers)
-                length = factorial(len(owntiles)) // factorial(len(owntiles) - l)
-                print(length)
-                if l <= 4:
-                    chunksize = 1000
-                elif l == 5:
-                    chunksize = 10000
-                else:
-                    chunksize = 20000
-                values = itertools.permutations(owntiles, r=l)
-                print(timeit.default_timer() - start_time)
-                if lang == 'EN':
-                    results = set(tqdm.tqdm(pool.imap_unordered(finder_EN, values, chunksize=chunksize), total=length))
-                if lang == 'HU':
-                    results = set(tqdm.tqdm(pool.imap_unordered(finder_HU, values, chunksize=chunksize), total=length))
-                pool.close()
-                pool.join()
-            print('Unique {} length words generated: {}'.format(l, len(results)))
-            return results
-        else:
-            textperm = set()
-            for i in range(2, (l+1)):
-                if __name__ == "__main__":
-                    start_time = timeit.default_timer()
-                    print("Estimating batch length...")
-                    pool = multiprocessing.Pool(processes=workers)
-                    length = factorial(len(owntiles)) // factorial(len(owntiles)-i)
-                    print(length)
-                    if i <= 4:
-                        chunksize = 1000
-                    elif i == 5:
-                        chunksize = 10000
-                    else:
-                        chunksize = 20000
-                    values = itertools.permutations(owntiles, r=i)
-                    print(timeit.default_timer() - start_time)
-                    if lang == 'EN':
-                        results = set(tqdm.tqdm(pool.imap_unordered(finder_EN, values, chunksize=chunksize), total=length))
-                    if lang == 'HU':
-                        results = set(tqdm.tqdm(pool.imap_unordered(finder_HU, values, chunksize=chunksize), total=length))
-                    pool.close()
-                    pool.join()
-                print('Unique {} length words generated: {}'.format(i, len(results)))
-                textperm |= results
-                print('Unique words generated so far: {}'.format(len(textperm)))
-            return textperm
-    else:
-        print('ERROR: Word length parameter less than 2!')
-
-
-# HU version to be written:
+# Check if word is in the dictionary (HU version to be polished):
 def checker(owntiles, dictionary, l):
     print(owntiles)
     valid_words = set()
-    #hasblank = owntiles.count('BLANK')
     if hasblank >= 1:
-        print("Removing BLANK tiles...")
-        #owntiles = owntiles.replace('BLANK', '')
         print(owntiles)
         for word in dictionary:
             if len(word) == l:
@@ -201,12 +116,7 @@ def checker(owntiles, dictionary, l):
 def word_check(owntiles, l, s, lang):
     if l >= 2:
         results = set()
-        #workers = multiprocessing.cpu_count()
         if s:
-            #if __name__ == "__main__":
-            print("Estimating batch length...")
-            length = len(EN_words)
-            print(length)
             if lang == 'EN':
                 results = set(checker(owntiles, EN_words, l))
             if lang == 'HU':
@@ -215,31 +125,15 @@ def word_check(owntiles, l, s, lang):
             return results
         else:
             textperm = set()
-            for i in range(2, (l+1)):
-                #if __name__ == "__main__":
+            for i in range(2, (l + 1)):
+                # if __name__ == "__main__":
                 start_time = timeit.default_timer()
-                #print("Estimating batch length...")
-                    #pool = multiprocessing.Pool(processes=workers)
-                    #length = factorial(len(owntiles)) // factorial(len(owntiles)-i)
-                    #print(length)
-                    #if i <= 4:
-                    #    chunksize = 1000
-                    #elif i == 5:
-                    #    chunksize = 10000
-                    #else:
-                    #    chunksize = 20000
-                    #values = itertools.permutations(owntiles, r=i)
-                    #print(timeit.default_timer() - start_time)
                 if lang == 'EN':
-                        #results = set(tqdm.tqdm(pool.imap_unordered(finder_EN, values, chunksize=chunksize), total=length))
                     results = set(checker(owntiles, EN_words, i))
                     print(timeit.default_timer() - start_time)
                 if lang == 'HU':
-                        #results = set(tqdm.tqdm(pool.imap_unordered(finder_HU, values, chunksize=chunksize), total=length))
                     results = set(checker(owntiles, HU_words, i))
                     print(timeit.default_timer() - start_time)
-                    #pool.close()
-                    #pool.join()
                 print('Unique {} length words generated: {}'.format(i, len(results)))
                 textperm |= results
                 print('Unique words generated so far: {}'.format(len(textperm)))
@@ -248,6 +142,7 @@ def word_check(owntiles, l, s, lang):
         print('ERROR: Word length parameter less than 2!')
 
 
+# Calculate word point values
 def score_calc(words, lang):
     if words != 1:
         if lang == 'EN':
@@ -299,15 +194,15 @@ def score_calc(words, lang):
 
 def group_by_score(scores):
     score_groups = sorted(set(val for val in scores.values()), reverse=True)
-    #print(score_groups)
+    # print(score_groups)
     grouped_words = {}
     for number in score_groups:
         wordgroup = []
         for i in scores.items():
-            #print(i)
+            # print(i)
             if i[1] == number:
                 wordgroup.extend(i[0:1])
-        #print(wordgroup)
+        # print(wordgroup)
         grouped_words[number] = sorted(wordgroup)
     return grouped_words
 
@@ -323,8 +218,11 @@ bootstrap = Bootstrap(app)
 
 
 class ConfigForm(FlaskForm):
-    language = RadioField('Language', choices=[('EN', 'English'),('HU', 'Hungarian')], validators=[DataRequired()])
-    max_word_length = RadioField('Max Word Length', choices=[(2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10'), (11, '11'), (12, '12'), (13, '13')], coerce=int, validators=[DataRequired()])
+    language = RadioField('Language', choices=[('EN', 'English'), ('HU', 'Hungarian')], validators=[DataRequired()])
+    max_word_length = RadioField('Max Word Length',
+                                 choices=[(2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7'), (8, '8'),
+                                          (9, '9'), (10, '10'), (11, '11'), (12, '12'), (13, '13')], coerce=int,
+                                 validators=[DataRequired()])
     own_tileset = StringField('Enter your own tiles here (without any breaks):')
     only_max = BooleanField('Only Max Length?')
     submit = SubmitField('Send')
@@ -333,7 +231,7 @@ class ConfigForm(FlaskForm):
 @app.route('/')
 def root():
     user = {'username': 'Peter'}
-    return render_template('index.html', title='Home', user=user, scores=grouped, tiles=tile_draw, blanks=hasblank)
+    return render_template('index.html', title='Home', user=user, scores=grouped, tiles='none', blanks='none')
 
 
 @app.route('/index')
@@ -347,14 +245,8 @@ def table():
     user = {'username': 'Peter'}
     mytable = build_table()
     print(mytable)
-    #i = 0
-    #for row in mytable:
-    #    print(row)
-    #    print(row[i])
-    #    row[i] = 'A'
-    #    i += 1
-    #return render_template('table.html', title='Table', user=user, table=mytable)
-    return render_template("table.html", title='Table', user=user, column_names=mytable.columns.values, row_data=list(mytable.values.tolist()),
+    return render_template("table.html", title='Table', user=user, column_names=mytable.columns.values,
+                           row_data=list(mytable.values.tolist()),
                            link_column="A", zip=zip)
 
 
@@ -367,25 +259,17 @@ def config():
 
         if request.method == 'POST':
             language = request.form['language']
-            if language == 'EN':
-                words = EN_words
-            elif language == 'HU':
-                words = HU_words
-            else:
-                print('ERROR: Unsupported Language!')
             max_word_length = int(request.form['max_word_length'])
             tiles = build_tileset(language)
             global tile_draw
             tile_draw = []
             global hasblank
             if form.own_tileset.data:
-                #own_tileset = []
+                # own_tileset = []
                 hasblank = form.own_tileset.data.count('BLANK')
                 if hasblank >= 1:
+                    print("Removing BLANK tiles...")
                     form.own_tileset.data = form.own_tileset.data.replace('BLANK', '')
-                #for i in range(hasblank):
-                #    for element in set(tiles[0:-2]):
-                #        form.own_tileset.data += str(element)
                 print(form.own_tileset.data)
                 if language == 'HU':
                     global hasdigraph
@@ -422,62 +306,9 @@ def config():
                 grouped = {0: 'Number of valid words found'}
             df = pd.DataFrame.from_dict(grouped, orient='index')
             print(df.transpose())
-            #plt = df.transpose().transpose().plot(kind='scatter')
-            #plt.show()
         return redirect(url_for('index'))
     return render_template('config.html', title='Configuration', form=form)
 
 
 if __name__ == '__main__':
-    #console_mode = input("Run without web GUI? (Y/N) ")
-    #print(console_mode)
-    #if console_mode != ('Y' or 'y'):
     app.run(host='0.0.0.0', debug=True)
-    # else:
-    #     language = input("Language? (EN/HU) ")
-    #     max_word_length = input("Maximum word length? (2+) ")
-    #     only_max = input("Calculate only for maximum length? (Y/N) ")
-    #     if only_max == ('Y' or 'y'):
-    #         only_max = bool(True)
-    #     else:
-    #         only_max = bool(False)
-    #     own_tileset = input("Own tiles? (NO or lowercase alphabets and BLANK for a maximum of 2 blank tiles)")
-    #     tiles = build_tileset(language)
-    #     tile_draw = []
-    #     if own_tileset != 'NO':
-    #         hasblank = own_tileset.count('BLANK')
-    #         if hasblank >= 1:
-    #             own_tileset = own_tileset.replace('BLANK', '')
-    #         for i in range(hasblank):
-    #             for element in set(tiles[0:-2]):
-    #                 own_tileset += str(element)
-    #         print(own_tileset)
-    #         if language == 'HU':
-    #             global hasdigraph
-    #             hasdigraph = 0
-    #             digraph_count = 0
-    #             digraphs = []
-    #             for digraph in ('cs', 'gy', 'sz', 'zs', 'ty', 'ly', 'ny'):
-    #                 if digraph in own_tileset:
-    #                     digraph_count += own_tileset.count(digraph)
-    #                     for i in range(digraph_count):
-    #                         hasdigraph += 1
-    #                         digraphs += digraph
-    #                     own_tileset.replace(digraph, '')
-    #             for character in own_tileset:
-    #                 tile_draw += [character]
-    #             tile_draw += digraphs
-    #         else:
-    #             for character in own_tileset:
-    #                 tile_draw += [character]
-    #     else:
-    #         tile_draw = draw(tiles, 7)
-    #     print('Tiles drawn: {}'.format(tile_draw))
-    #     valid_words = word_gen_mt(tile_draw, int(max_word_length), only_max, language)
-    #     grouped = {}
-    #     if valid_words != 'NONE':
-    #         scores = score_calc(valid_words, language)
-    #         grouped = group_by_score(scores)
-    #     else:
-    #         grouped = {0: 'Number of valid words found'}
-    #     #print(grouped)
