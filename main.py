@@ -5,16 +5,15 @@ from flask import Flask, render_template, flash, redirect, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, RadioField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
-from flask_bootstrap import Bootstrap
 
 
 # Load Word dictionary from files.
-filename = 'Scrabble.txt'  # Scrabble EN word list
+filename = './static/Scrabble.txt'  # Scrabble EN word list
 db = open(filename, encoding='utf-8')
 EN_words = set(db.read().splitlines())
 db.close()
 
-filename = 'szavak.txt'  # https://sourceforge.net/projects/wordlist-hu/ hu_HU word list
+filename = './static/szavak.txt'  # https://sourceforge.net/projects/wordlist-hu/ hu_HU word list
 db = open(filename, encoding='utf-8')
 HU_words = set(db.read().splitlines())
 db.close()
@@ -75,10 +74,8 @@ def draw(tileset, n):
 
 # Check if word is in the dictionary (HU version to be polished):
 def checker(owntiles, dictionary, l):
-    print(owntiles)
     valid_words = set()
     if hasblank >= 1:
-        print(owntiles)
         for word in dictionary:
             if len(word) == l:
                 word = word.lower()
@@ -93,7 +90,6 @@ def checker(owntiles, dictionary, l):
                         pass
                 if matches == l or matches == (l - hasblank):
                     valid_words.add(word)
-                    print(word)
     else:
         for word in dictionary:
             if len(word) == l:
@@ -109,7 +105,6 @@ def checker(owntiles, dictionary, l):
                         pass
                 if matches == l:
                     valid_words.add(word)
-    print(valid_words)
     return valid_words
 
 
@@ -126,7 +121,6 @@ def word_check(owntiles, l, s, lang):
         else:
             textperm = set()
             for i in range(2, (l + 1)):
-                # if __name__ == "__main__":
                 start_time = timeit.default_timer()
                 if lang == 'EN':
                     results = set(checker(owntiles, EN_words, i))
@@ -154,7 +148,6 @@ def score_calc(words, lang):
             characters_en.update(dict.fromkeys(["j", "x"], 8))
             characters_en.update(dict.fromkeys(["q", "z"], 10))
             characters_en.update(dict.fromkeys(["BLANK"], 0))
-            # print(characters_en)
             scores = {}
             for word in words:
                 if word != ():
@@ -162,7 +155,6 @@ def score_calc(words, lang):
                     for character in word:
                         value += characters_en.get(character, 0)
                     scores[word] = value
-            print(scores)
             return scores
         elif lang == 'HU':
             characters_en = dict.fromkeys(["i", "m", "o", "s", "á", "l", "n", "r", "t", "a", "e", "k"], 1)
@@ -174,7 +166,6 @@ def score_calc(words, lang):
             characters_en.update(dict.fromkeys(["ly", "zs"], 8))
             characters_en.update(dict.fromkeys(["ty"], 10))
             characters_en.update(dict.fromkeys(["BLANK"], 0))
-            # print(characters_en)
             scores = {}
             for word in words:
                 if word != ():
@@ -182,7 +173,6 @@ def score_calc(words, lang):
                     for character in word:
                         value += characters_en.get(character, 0)
                     scores[word] = value
-            print(scores)
             return scores
         else:
             print('ERROR: Unsupported Language: {}'.format(lang))
@@ -194,27 +184,22 @@ def score_calc(words, lang):
 
 def group_by_score(scores):
     score_groups = sorted(set(val for val in scores.values()), reverse=True)
-    # print(score_groups)
     grouped_words = {}
     for number in score_groups:
         wordgroup = []
         for i in scores.items():
-            # print(i)
             if i[1] == number:
                 wordgroup.extend(i[0:1])
-        # print(wordgroup)
         grouped_words[number] = sorted(wordgroup)
     return grouped_words
 
 
 def calc_best_hand(tiles):
-    start_time = timeit.default_timer()
-    print(timeit.default_timer() - start_time)
+    pass  # to be implemented
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'nobody-gonna-guess-it'
-bootstrap = Bootstrap(app)
 
 
 class ConfigForm(FlaskForm):
@@ -244,7 +229,6 @@ def index():
 def table():
     user = {'username': 'Peter'}
     mytable = build_table()
-    print(mytable)
     return render_template("table.html", title='Table', user=user, column_names=mytable.columns.values,
                            row_data=list(mytable.values.tolist()),
                            link_column="A", zip=zip)
@@ -270,7 +254,6 @@ def config():
                 if hasblank >= 1:
                     print("Removing BLANK tiles...")
                     form.own_tileset.data = form.own_tileset.data.replace('BLANK', '')
-                print(form.own_tileset.data)
                 if language == 'HU':
                     global hasdigraph
                     hasdigraph = 0
@@ -305,10 +288,10 @@ def config():
             else:
                 grouped = {0: 'Number of valid words found'}
             df = pd.DataFrame.from_dict(grouped, orient='index')
-            print(df.transpose())
+            # print(df.transpose())
         return redirect(url_for('index'))
     return render_template('config.html', title='Configuration', form=form)
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(debug=True)

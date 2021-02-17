@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi, {{ user.username }}!</h1>
     <div>
-    <table class="table-dark table-bordered">
+    <table class="table table-bordered table-hover">
     <tr>
         {% for col in column_names %}
         <th>{{col}}</th>

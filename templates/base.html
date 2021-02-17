@@ -1,28 +1,40 @@
-{% extends 'bootstrap/base.html' %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-{% block title %}
-      {% if title %}{{ title }} - Scrabble{% else %}Welcome to Scrabble Cheater{% endif %}
-{% endblock %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <script src="https://use.fontawesome.com/18a5688b69.js"></script>
 
-{% block navbar %}
-    <nav class="navbar navbar-default">
-            Scrabble:
-            <a href="{{ url_for('root') }}">Home</a>
-            <a href="{{ url_for('table') }}">Table</a>
-            <a href="{{ url_for('config') }}">Configuration</a>
-    </nav>
-{% endblock %}
+    {% block navbar %}
+        <nav class="nav nav-pills bg-light flex-column flex-sm-row sticky-top pt-1 pb-1">
+                <a class="flex-sm-fill text-sm-center nav-link" href="{{ url_for('root') }}"><i class="fa fa-home fa-3x"></i></a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="{{ url_for('table') }}"><i class="fa fa-table fa-3x"></i></a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="{{ url_for('config') }}"><i class="fa fa-sliders fa-3x"></i></a>
+        </nav>
+    {% endblock %}
 
-{% block content %}
-    <div class="container">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
+    {% block content %}
+        <div class="container">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
 
-        {% block app_content %}{% endblock %}
-    </div>
-{% endblock %}
+            {% block app_content %}{% endblock %}
+        </div>
+    {% endblock %}
+
+  </head>
+
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+  </body>
+</html>

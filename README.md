@@ -2,8 +2,6 @@
 
 Scrabble calculator pet project with Flask
 
-Demo: [kasztp.eu.pythonanywhere.com](https://kasztp.eu.pythonanywhere.com)
-
 ## Authors
 
 * **Peter Kaszt** - *Initial work*

@@ -1,30 +1,32 @@
 {% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
 
 {% block content %}
-    <h1>Configuration</h1>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-                {{ form.language.label }}<br>
-                {{ form.language }}
-                {% for error in form.language.errors %}
+<div class="card pt-3 pl-3 mx-auto" style="width: 80%; margin: 50px;">
+    <h1 class="card-header m-3" style="width: 95%; margin: 50px;">Configuration</h1>
+    <div class="form-group m-3">
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                    {{ form.language.label }}<br>
+                    {{ form.language }}
+                    {% for error in form.language.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+            </p>
+            <p>
+                {{ form.max_word_length.label }}<br>
+                {{ form.max_word_length }}
+                {% for error in form.max_word_length.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
-        </p>
-        <p>
-            {{ form.max_word_length.label }}<br>
-            {{ form.max_word_length }}
-            {% for error in form.max_word_length.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.own_tileset.label }}<br>
-            {{ form.own_tileset(size=7) }}
-        </p>
-        <p>{{ form.only_max() }} {{ form.only_max.label }}</p>
-        <p>{{ form.submit() }}</p>
-    </form>
+            </p>
+            <p>
+                {{ form.own_tileset.label }}<br>
+                {{ form.own_tileset(size=7) }}
+            </p>
+            <p>{{ form.only_max() }} {{ form.only_max.label }}</p>
+            <p>{{ form.submit() }}</p>
+        </form>
     </div>
+</div>
 {% endblock %}
