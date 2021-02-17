@@ -1,6 +1,8 @@
 # Scrabble
 
-Scrabble calculator pet project with Flask
+Scrabble calculator pet project with Flask, Bootstrap & Fontawesome
+
+Demo: https://kasztp.eu.pythonanywhere.com/
 
 ## Authors
 
