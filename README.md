@@ -2,7 +2,7 @@
 
 Scrabble calculator pet project with Flask, Bootstrap & FontAwesome
 
-Demo: https://kasztp.eu.pythonanywhere.com/index
+Demo: https://kasztp.eu.pythonanywhere.com/
 
 ## Authors
 
