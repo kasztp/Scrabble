@@ -1,29 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div>
-    <table class="table table-bordered table-hover">
-    <tr>
-        {% for col in column_names %}
-        <th>{{col}}</th>
-        {% endfor %}
-    </tr>
+    <div class="card pt-3 pl-3 mx-auto" style="width: 100%; margin: 50px;">
     {% for row in row_data %}
-    <tr>
+    <div class="row">
         {% for col, row_ in zip(column_names, row) %}
         {% if col == link_column %}
-        <td>
-            <button type="submit" value={{ row_ }} name="person_id" form="patient_form" class="patient_button">
+        <div class="col">
+            <p style = "text-align: center; font-family: scrabblefont; font-size: 30px; color: rgb(0, 102, 204)">
                 {{ row_ }}
-            </button>
-        </td>
+            </p>
+        </div>
         {% else %}
-        <td>{{row_}}</td>
+        <div class="col">
+            <p style = "text-align: center; font-family: scrabblefont; font-size: 30px; color: rgb(0, 102, 204)">
+                {{row_}}
+            </p>
+        </div>
         {% endif %}
         {% endfor %}
-    </tr>
+    </div>
     {% endfor %}
-
-    </table>
     </div>
 {% endblock %}
+

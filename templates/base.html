@@ -9,6 +9,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
     <script src="https://use.fontawesome.com/18a5688b69.js"></script>
 
+      <style>
+        @font-face {
+          font-family: scrabblefont;
+          src: url(./static/fonts/Scramblemixed-YEdO.ttf);
+        }
+        </style>
+
     {% block navbar %}
         <nav class="nav nav-pills bg-light flex-column flex-sm-row sticky-top pt-1 pb-1">
                 <a class="flex-sm-fill text-sm-center nav-link" href="{{ url_for('root') }}"><i class="fa fa-home fa-3x"></i></a>

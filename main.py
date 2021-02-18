@@ -25,7 +25,7 @@ grouped = {}
 # Build Scrabble table representation as Pandas dataframe
 def build_table():
     table = [['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']]
-    for i in range(15):
+    for _ in range(15):
         table += [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
         df = pd.DataFrame(table)
     return df
@@ -34,11 +34,11 @@ def build_table():
 # Build language specific tile set
 def build_tileset(lang):
     if lang == 'EN':
-        tile_set = ['a'] * 9 + ['b'] * 2 + ['c'] * 2 + ['d'] * 4 + ['e'] * 12 + ['f'] * 2 + ['g'] * 3 + ['h'] * 2 + [
-            'i'] * 9 + ['j'] + \
-                   ['k'] + ['l'] * 4 + ['m'] * 2 + ['n'] * 6 + ['o'] * 8 + ['p'] * 2 + ['q'] + ['r'] * 6 + ['s'] * 4 + [
-                       't'] * 6 + \
-                   ['u'] * 4 + ['v'] * 2 + ['w'] * 2 + ['x'] + ['y'] * 2 + ['z'] + ['BLANK'] * 2
+        tile_set = ['a'] * 9 + ['b'] * 2 + ['c'] * 2 + ['d'] * 4 + ['e'] * 12 + ['f'] * 2 +\
+                   ['g'] * 3 + ['h'] * 2 + ['i'] * 9 + ['j'] + ['k'] + ['l'] * 4 + ['m'] * 2 +\
+                   ['n'] * 6 + ['o'] * 8 + ['p'] * 2 + ['q'] + ['r'] * 6 + ['s'] * 4 + ['t'] * 6 +\
+                   ['u'] * 4 + ['v'] * 2 + ['w'] * 2 + ['x'] + ['y'] * 2 + ['z'] +\
+                   ['BLANK'] * 2
         if len(tile_set) == 100:
             print('Tile set generated OK!')
             return tile_set
@@ -46,11 +46,12 @@ def build_tileset(lang):
             print('ERROR: Tile set generation error with length: {}'.format(len(tile_set)))
             return len(tile_set)
     elif lang == 'HU':
-        tile_set = ['a'] * 6 + ['b'] * 3 + ['c'] + ['d'] * 3 + ['e'] * 6 + ['f'] * 2 + ['g'] * 3 + ['h'] * 2 + \
-                   ['i'] * 3 + ['j'] * 2 + ['k'] * 6 + ['l'] * 4 + ['m'] * 3 + ['n'] * 4 + ['o'] * 3 + ['p'] * 2 + \
-                   ['á'] * 4 + ['r'] * 4 + ['s'] * 3 + ['t'] * 5 + ['u'] * 2 + ['v'] * 2 + ['é'] * 3 + ['í'] + \
-                   ['ó'] * 3 + ['z'] * 2 + ['ö'] * 2 + ['ő'] + ['ú'] + ['ü'] * 2 + ['ű'] + ['sz'] * 2 + ['gy'] * 2 + \
-                   ['ny'] + ['cs'] + ['ly'] + ['zs'] + ['ty'] + ['BLANK'] * 2
+        tile_set = ['a'] * 6 + ['b'] * 3 + ['c'] + ['d'] * 3 + ['e'] * 6 + ['f'] * 2 + ['g'] * 3 +\
+                   ['h'] * 2 + ['i'] * 3 + ['j'] * 2 + ['k'] * 6 + ['l'] * 4 + ['m'] * 3 + ['n'] * 4 +\
+                   ['o'] * 3 + ['p'] * 2 + ['á'] * 4 + ['r'] * 4 + ['s'] * 3 + ['t'] * 5 + ['u'] * 2 +\
+                   ['v'] * 2 + ['é'] * 3 + ['í'] + ['ó'] * 3 + ['z'] * 2 + ['ö'] * 2 + ['ő'] + ['ú'] +\
+                   ['ü'] * 2 + ['ű'] + ['sz'] * 2 + ['gy'] * 2 + ['ny'] + ['cs'] + ['ly'] + ['zs'] + ['ty'] +\
+                   ['BLANK'] * 2
         if len(tile_set) == 100:
             print('Tile set generated OK!')
             return tile_set
@@ -88,7 +89,7 @@ def checker(owntiles, dictionary, l):
                         owntiles_tmp.remove(character)
                     else:
                         pass
-                if matches == l or matches == (l - hasblank):
+                if matches in (l, l - hasblank):
                     valid_words.add(word)
     else:
         for word in dictionary:
@@ -194,10 +195,6 @@ def group_by_score(scores):
     return grouped_words
 
 
-def calc_best_hand(tiles):
-    pass  # to be implemented
-
-
 app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'nobody-gonna-guess-it'
 
@@ -249,7 +246,6 @@ def config():
             tile_draw = []
             global hasblank
             if form.own_tileset.data:
-                # own_tileset = []
                 hasblank = form.own_tileset.data.count('BLANK')
                 if hasblank >= 1:
                     print("Removing BLANK tiles...")
@@ -262,7 +258,7 @@ def config():
                     for digraph in ('cs', 'gy', 'sz', 'zs', 'ty', 'ly', 'ny'):
                         if digraph in form.own_tileset.data:
                             digraph_count += form.own_tileset.data.count(digraph)
-                            for i in range(digraph_count):
+                            for _ in range(digraph_count):
                                 hasdigraph += 1
                                 digraphs += digraph
                             form.own_tileset.data.replace(digraph, '')
@@ -287,8 +283,6 @@ def config():
                 grouped = group_by_score(scores)
             else:
                 grouped = {0: 'Number of valid words found'}
-            df = pd.DataFrame.from_dict(grouped, orient='index')
-            # print(df.transpose())
         return redirect(url_for('index'))
     return render_template('config.html', title='Configuration', form=form)
 

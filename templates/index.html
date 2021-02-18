@@ -2,20 +2,20 @@
 
 {% block content %}
     <div>
-       <p>Tiles: {{ tiles }} - Blank Tiles: {{ blanks }}</p>
-    <table class="table table-bordered table-hover bg-light">
-        <thead class="thead-dark">
-        <tr>
-            <th>Point Value</th><th>Words</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for score,v in scores.items() %}
-        <tr>
-            <td>{{ score }}</td><td>{% for w in v %}{{ w }} {% endfor %}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <p style = "text-align: center; font-family: scrabblefont; font-size: 50px; color: rgb(0, 102, 204)">{% for w in tiles %}{{ w }} {% endfor %} + {{ blanks }}</p>
+        <table class="table table-bordered table-hover bg-light">
+            <thead class="thead-dark">
+            <tr>
+                <th>Point Value</th><th>Words</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for score,v in scores.items() %}
+            <tr>
+                <td>{{ score }}</td><td>{% for w in v %}{{ w }} {% endfor %}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}

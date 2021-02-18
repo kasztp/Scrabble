@@ -216,3 +216,9 @@ if __name__ == '__main__':
     #         grouped = {0: 'Number of valid words found'}
     #     #print(grouped)
 
+
+    <div class="row">
+        {% for col in column_names %}
+        <div class="col" style = "text-align: center; font-family: scrabblefont; font-size: 30px; color: rgb(0, 102, 204)">{{col}}</div>
+        {% endfor %}
+    </div>
