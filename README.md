@@ -11,4 +11,4 @@ Demo: https://kasztp.eu.pythonanywhere.com/
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
+Font: https://www.fontspace.com/scramblemixed-font-f4716
