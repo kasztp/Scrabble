@@ -32,7 +32,8 @@ def table():
 def config():
     form = ConfigForm()
     if form.validate_on_submit():
-        flash(f'Configuration: Language {form.language.data}, Max Word Length {form.max_word_length.data},'
+        flash(f'Configuration: Language {form.language.data},'
+              f'Max Word Length {form.max_word_length.data},'
               f'Calculate for Maximum Length Only={form.max_word_length.data}')
 
         if request.method == 'POST':

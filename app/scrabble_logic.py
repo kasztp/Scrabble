@@ -4,7 +4,7 @@ import pandas as pd
 
 # Load Word dictionaries from text files.
 EN_FILENAME = './app/static/Scrabble.txt'  # Scrabble EN word list
-HU_FILENAME = './app/static/szavak.txt'  # https://sourceforge.net/projects/wordlist-hu/ hu_HU word list
+HU_FILENAME = './app/static/szavak.txt'  # https://sourceforge.net/projects/wordlist-hu/ hu_HU list
 with open(HU_FILENAME, encoding='utf-8') as hu_file, open(EN_FILENAME, encoding='utf-8') as en_file:
     EN_WORDS = set(en_file.read().splitlines())
     HU_WORDS = set(hu_file.read().splitlines())
@@ -61,10 +61,11 @@ class Scrabble:
     @staticmethod
     def build_tileset(lang: str) -> list:
         if lang == 'EN':
-            tile_set = ['a'] * 9 + ['b'] * 2 + ['c'] * 2 + ['d'] * 4 + ['e'] * 12 + ['f'] * 2 + \
-                       ['g'] * 3 + ['h'] * 2 + ['i'] * 9 + ['j'] + ['k'] + ['l'] * 4 + ['m'] * 2 + \
-                       ['n'] * 6 + ['o'] * 8 + ['p'] * 2 + ['q'] + ['r'] * 6 + ['s'] * 4 + ['t'] * 6 + \
-                       ['u'] * 4 + ['v'] * 2 + ['w'] * 2 + ['x'] + ['y'] * 2 + ['z'] + \
+            tile_set = ['a'] * 9 + ['b'] * 2 + ['c'] * 2 + ['d'] * 4 + ['e'] * 12 +\
+                       ['f'] * 2 + ['g'] * 3 + ['h'] * 2 + ['i'] * 9 + ['j'] + ['k'] +\
+                       ['l'] * 4 + ['m'] * 2 + ['n'] * 6 + ['o'] * 8 + ['p'] * 2 +\
+                       ['q'] + ['r'] * 6 + ['s'] * 4 + ['t'] * 6 + ['u'] * 4 +\
+                       ['v'] * 2 + ['w'] * 2 + ['x'] + ['y'] * 2 + ['z'] + \
                        ['BLANK'] * 2
             if len(tile_set) == 100:
                 print('Tile set generated OK!')
@@ -73,11 +74,12 @@ class Scrabble:
                 print(f'ERROR: Tile set generation error with length: {len(tile_set)}')
                 return len(tile_set)
         elif lang == 'HU':
-            tile_set = ['a'] * 6 + ['b'] * 3 + ['c'] + ['d'] * 3 + ['e'] * 6 + ['f'] * 2 + ['g'] * 3 + \
-                       ['h'] * 2 + ['i'] * 3 + ['j'] * 2 + ['k'] * 6 + ['l'] * 4 + ['m'] * 3 + ['n'] * 4 + \
-                       ['o'] * 3 + ['p'] * 2 + ['á'] * 4 + ['r'] * 4 + ['s'] * 3 + ['t'] * 5 + ['u'] * 2 + \
-                       ['v'] * 2 + ['é'] * 3 + ['í'] + ['ó'] * 3 + ['z'] * 2 + ['ö'] * 2 + ['ő'] + ['ú'] + \
-                       ['ü'] * 2 + ['ű'] + ['sz'] * 2 + ['gy'] * 2 + ['ny'] + ['cs'] + ['ly'] + ['zs'] + ['ty'] + \
+            tile_set = ['a'] * 6 + ['b'] * 3 + ['c'] + ['d'] * 3 + ['e'] * 6 + ['f'] * 2 +\
+                       ['g'] * 3 + ['h'] * 2 + ['i'] * 3 + ['j'] * 2 + ['k'] * 6 + ['l'] * 4 +\
+                       ['m'] * 3 + ['n'] * 4 + ['o'] * 3 + ['p'] * 2 + ['á'] * 4 + ['r'] * 4 +\
+                       ['s'] * 3 + ['t'] * 5 + ['u'] * 2 + ['v'] * 2 + ['é'] * 3 + ['í'] +\
+                       ['ó'] * 3 + ['z'] * 2 + ['ö'] * 2 + ['ő'] + ['ú'] + ['ü'] * 2 + ['ű'] +\
+                       ['sz'] * 2 + ['gy'] * 2 + ['ny'] + ['cs'] + ['ly'] + ['zs'] + ['ty'] + \
                        ['BLANK'] * 2
             if len(tile_set) == 100:
                 print('Tile set generated OK!')
@@ -103,8 +105,6 @@ class Scrabble:
                         if character in owntiles_tmp:
                             matches += 1
                             owntiles_tmp.remove(character)
-                        else:
-                            pass
                     if matches in (length, length - self.hand.hasblank):
                         valid_words.add(word)
         else:
@@ -118,8 +118,6 @@ class Scrabble:
                         if character in owntiles_tmp:
                             matches += 1
                             owntiles_tmp.remove(character)
-                        else:
-                            pass
                     if matches == length:
                         valid_words.add(word)
         return valid_words
@@ -186,7 +184,7 @@ class Scrabble:
         else:
             print('ERROR: NO valid words given!')
             return 'NONE'
-    
+
     def group_by_score(self, scores: dict) -> dict:
         score_groups = sorted(set(val for val in scores.values()), reverse=True)
         grouped_words = {}

@@ -1,23 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="card pt-3 pl-3 mx-auto" style="width: 100%; margin: 50px;">
+    <div class="card mx-auto align-items-center" style="width: 50%; height: 50%; margin: 50px;">
     {% for row in row_data %}
-    <div class="row">
+    <div class="row row-cols-auto">
         {% for col, row_ in zip(column_names, row) %}
-        {% if col == link_column %}
-        <div class="col">
-            <p style = "text-align: center; font-family: scrabblefont; font-size: 50px; color: rgb(0, 102, 204)">
-                {{ row_ }}
-            </p>
-        </div>
-        {% else %}
-        <div class="col">
-            <p style = "text-align: center; font-family: scrabblefont; font-size: 50px; color: rgb(0, 102, 204)">
+        <div class="col-sm-auto p-0">
+            <div class="card lh-1" style="height: 60px; margin: 0px; padding: 0px; text-align: center; font-family: scrabblefont; font-size: 60px; color: rgb(0, 102, 204)">
                 {{row_}}
-            </p>
+            </div>
         </div>
-        {% endif %}
         {% endfor %}
     </div>
     {% endfor %}
