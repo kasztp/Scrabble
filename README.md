@@ -1,4 +1,4 @@
-# Scrabble
+# Scrabble [![Pylint](https://github.com/kasztp/Scrabble/actions/workflows/pylint.yml/badge.svg)](https://github.com/kasztp/Scrabble/actions/workflows/pylint.yml)
 
 Scrabble calculator pet project with Flask, Bootstrap & FontAwesome
 
