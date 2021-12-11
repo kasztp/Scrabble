@@ -2,7 +2,7 @@
 
 Scrabble calculator pet project with Flask, Bootstrap & FontAwesome
 
-Demo (Pythonanywhere): https://kasztp.eu.pythonanywhere.com/
+Demo (Pythonanywhere): https://kasztp.eu.pythonanywhere.com/  
 Demo (AWS Lambda): https://b9220wd1xe.execute-api.eu-central-1.amazonaws.com/dev/
 
 ## Authors
