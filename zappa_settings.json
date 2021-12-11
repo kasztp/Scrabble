@@ -1,0 +1,10 @@
+{
+    "dev": {
+        "app_function": "scrabble.app",
+        "profile_name": "default",
+        "project_name": "scrabble_helper",
+        "runtime": "python3.8",
+        "s3_bucket": "zappa-scrabble-helper",
+        "aws_region": "eu-central-1"
+    }
+}
