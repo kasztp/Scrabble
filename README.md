@@ -11,5 +11,5 @@ Demo (AWS Lambda): https://b9220wd1xe.execute-api.eu-central-1.amazonaws.com/dev
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.  
 Font: https://www.fontspace.com/scramblemixed-font-f4716
